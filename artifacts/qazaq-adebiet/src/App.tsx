@@ -12,6 +12,8 @@ import PoetsPage from '@/pages/poets/PoetsPage';
 import PoetDetailPage from '@/pages/poets/PoetDetailPage';
 import WritersPage from '@/pages/writers/WritersPage';
 import WriterDetailPage from '@/pages/writers/WriterDetailPage';
+import ZhyrauPage from '@/pages/zhyrau/ZhyrauPage';
+import ZhyrauDetailPage from '@/pages/zhyrau/ZhyrauDetailPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -81,6 +83,13 @@ function Router() {
       </Route>
       <Route path="/writers/:slug">
         {() => <AppShell><WriterDetailPage /></AppShell>}
+      </Route>
+
+      <Route path="/zhyrau">
+        {() => <AppShell><ZhyrauPage /></AppShell>}
+      </Route>
+      <Route path="/zhyrau/:slug">
+        {() => <AppShell><ZhyrauDetailPage /></AppShell>}
       </Route>
 
       <Route path="/author/:slug">
