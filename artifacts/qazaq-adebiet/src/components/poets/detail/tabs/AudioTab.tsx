@@ -26,17 +26,12 @@ function AudioPlayer({ audio, isActive, onPlay }: { audio: PoetAudio, isActive: 
   }, [playbackRate]);
 
   const togglePlay = () => {
+    if (!audio.url) return; // no URL — do nothing
     if (isPlaying) {
       audioRef.current?.pause();
       setIsPlaying(false);
     } else {
-      onPlay(); // notifies parent this is the active one
-      // If we don't have a real URL, just fake it for UI demo
-      if (!audio.url) {
-        setIsPlaying(true);
-        if (!duration) setDuration(fallbackDuration);
-        return;
-      }
+      onPlay();
       audioRef.current?.play();
       setIsPlaying(true);
     }
@@ -64,29 +59,22 @@ function AudioPlayer({ audio, isActive, onPlay }: { audio: PoetAudio, isActive: 
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  // Fake progress interval for demo when no URL is provided
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    if (isPlaying && !audio.url) {
-      interval = setInterval(() => {
-        setProgress(p => {
-          if (p >= fallbackDuration) {
-            setIsPlaying(false);
-            return 0;
-          }
-          return p + 1;
-        });
-      }, 1000 / playbackRate);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, audio.url, fallbackDuration, playbackRate]);
+  // (No fake progress — if URL is absent we disable the player)
 
   const speeds = [0.75, 1, 1.25, 1.5, 2];
 
+  const hasUrl = !!audio.url;
+
   return (
     <div className={`glass-card rounded-2xl p-5 transition-all ${isActive ? 'border-primary/50 bg-primary/5' : ''}`}>
+      {!hasUrl && (
+        <div className="flex items-center gap-2 text-amber-300/80 text-xs mb-3 px-1">
+          <Music className="w-3 h-3 shrink-0" />
+          Аудио файл уақытша қолжетімсіз
+        </div>
+      )}
       <div className="flex items-center gap-4">
-        {audio.url && (
+        {hasUrl && (
           <audio 
             ref={audioRef} 
             src={audio.url} 
@@ -98,7 +86,10 @@ function AudioPlayer({ audio, isActive, onPlay }: { audio: PoetAudio, isActive: 
         
         <button 
           onClick={togglePlay}
+          disabled={!hasUrl}
+          title={hasUrl ? undefined : 'Аудио файл жоқ'}
           className={`w-12 h-12 rounded-full flex items-center justify-center shrink-0 transition-colors ${
+            !hasUrl ? 'bg-white/5 text-white/25 cursor-not-allowed' :
             isPlaying ? 'bg-primary text-white' : 'bg-white/10 text-white hover:bg-primary hover:text-white'
           }`}
         >

@@ -134,6 +134,7 @@ export default function WriterAudioTab({ writer }: Props) {
   }, []);
 
   const activeAudio = audioList[activeIdx];
+  const activeHasUrl = !!(activeAudio?.url);
 
   if (audioList.length === 0) {
     return (
@@ -151,9 +152,17 @@ export default function WriterAudioTab({ writer }: Props) {
       {/* ── Player ───────────────────────────────────────────────────────────── */}
       {activeAudio && (
         <div className="rounded-3xl border border-violet-500/25 bg-gradient-to-br from-slate-900 to-slate-950 p-6 mb-8 shadow-[0_0_40px_rgba(139,92,246,0.15)]">
-          {/* Audio element (hidden — no actual audio URLs in sample data) */}
-          {activeAudio.url && (
+          {/* Real audio element — only when URL present */}
+          {activeHasUrl && (
             <audio ref={audioRef} src={activeAudio.url} preload="metadata" />
+          )}
+
+          {/* No-URL notice */}
+          {!activeHasUrl && (
+            <div className="mb-4 flex items-center gap-2 px-4 py-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 text-sm">
+              <Headphones size={15} className="shrink-0" />
+              Аудио файл уақытша қолжетімсіз — жақын арада қосылады
+            </div>
           )}
 
           {/* Wave + title */}
@@ -166,7 +175,7 @@ export default function WriterAudioTab({ writer }: Props) {
               {activeAudio.narrator && <p className="text-white/45 text-sm">Дауыс: {activeAudio.narrator}</p>}
               <p className="text-white/30 text-xs">{activeAudio.duration}</p>
             </div>
-            <WaveAnimation playing={playing} />
+            <WaveAnimation playing={playing && activeHasUrl} />
           </div>
 
           {/* Progress bar */}
@@ -176,8 +185,9 @@ export default function WriterAudioTab({ writer }: Props) {
               min={0}
               max={duration || 100}
               value={currentTime}
-              onChange={seek}
-              className="w-full h-1.5 accent-violet-500 cursor-pointer"
+              onChange={activeHasUrl ? seek : undefined}
+              disabled={!activeHasUrl}
+              className="w-full h-1.5 accent-violet-500 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             />
             <div className="flex justify-between text-xs text-white/30 mt-1">
               <span>{formatTime(currentTime)}</span>
@@ -196,10 +206,15 @@ export default function WriterAudioTab({ writer }: Props) {
             </button>
 
             <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={togglePlay}
-              className="w-14 h-14 rounded-full bg-gradient-to-br from-violet-600 to-blue-600 flex items-center justify-center shadow-[0_0_24px_rgba(139,92,246,0.45)] hover:shadow-[0_0_32px_rgba(139,92,246,0.6)] transition-all"
+              whileHover={{ scale: activeHasUrl ? 1.05 : 1 }}
+              whileTap={{ scale: activeHasUrl ? 0.95 : 1 }}
+              onClick={activeHasUrl ? togglePlay : undefined}
+              title={activeHasUrl ? undefined : 'Аудио файл жоқ'}
+              className={`w-14 h-14 rounded-full flex items-center justify-center transition-all ${
+                activeHasUrl
+                  ? 'bg-gradient-to-br from-violet-600 to-blue-600 shadow-[0_0_24px_rgba(139,92,246,0.45)] hover:shadow-[0_0_32px_rgba(139,92,246,0.6)] cursor-pointer'
+                  : 'bg-white/10 cursor-not-allowed opacity-50'
+              }`}
             >
               {playing ? <Pause size={22} className="text-white" /> : <Play size={22} className="text-white ml-0.5" />}
             </motion.button>

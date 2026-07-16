@@ -1,10 +1,13 @@
 import { useRef, useState, useEffect } from 'react';
-import { useParams } from 'wouter';
+import { useParams, useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, BookOpen } from 'lucide-react';
+import { AlertCircle, BookOpen, BookText } from 'lucide-react';
 
 import pdfLibrary from '@/data/pdf-library.json';
+import booksJson from '@/data/books.json';
 import type { PdfBook } from '@/types/pdf-reader';
+
+const TEXT_READER_SLUGS = new Set((booksJson as { slug: string }[]).map(b => b.slug));
 import { usePdfReader } from '@/hooks/usePdfReader';
 import { getUploadedBook, getObjectUrl } from '@/db/pdfStorage';
 import type { PdfCanvasHandle } from '@/components/reader/PdfCanvas';
@@ -19,7 +22,9 @@ const staticBooks = pdfLibrary as PdfBook[];
 export default function PdfReaderPage() {
   const params    = useParams<{ slug: string }>();
   const slug      = params.slug ?? '';
+  const [, navigate] = useLocation();
   const canvasRef = useRef<PdfCanvasHandle>(null);
+  const hasTextReader = TEXT_READER_SLUGS.has(slug);
 
   // Resolve book: static JSON first, then IndexedDB
   const [book, setBook]       = useState<PdfBook | null>(() => staticBooks.find(b => b.slug === slug) ?? null);
@@ -94,6 +99,20 @@ export default function PdfReaderPage() {
         <AlertCircle size={48} className="text-orange-400" />
         <h1 className="text-2xl font-bold text-white">Кітап табылмады</h1>
         <p className="text-gray-400">«{slug}» атты PDF кітапхананда жоқ.</p>
+        {hasTextReader && (
+          <button
+            onClick={() => navigate(`/reader/${slug}`)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-violet-500 hover:bg-violet-400 text-white font-medium transition-colors"
+          >
+            <BookText size={16} /> Мәтінді оқу
+          </button>
+        )}
+        <button
+          onClick={() => navigate('/reader')}
+          className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/10 hover:bg-white/15 text-white font-medium transition-colors"
+        >
+          Кітапханаға оралу
+        </button>
       </div>
     );
   }
@@ -172,6 +191,7 @@ export default function PdfReaderPage() {
               currentPage={state.currentPage}
               totalPages={totalPages}
               canvasRef={canvasRef}
+              textSlug={hasTextReader ? slug : undefined}
               onDocumentLoad={(pages, text) => { setTotalPages(pages); setHasText(text); }}
             />
           ) : (
@@ -192,6 +212,7 @@ export default function PdfReaderPage() {
                   rotation={state.rotation}
                   readingMode={state.mode}
                   layout={state.layout}
+                  textSlug={hasTextReader ? slug : undefined}
                   onDocumentLoad={(pages, text) => { setTotalPages(pages); setHasText(text); }}
                 />
               </motion.div>
@@ -221,7 +242,7 @@ export default function PdfReaderPage() {
 }
 
 // ─── Continuous scroll viewer ─────────────────────────────────
-function ContinuousViewer({ book, pdfUrl, zoom, rotation, readingMode, currentPage, totalPages, canvasRef, onDocumentLoad }: {
+function ContinuousViewer({ book, pdfUrl, zoom, rotation, readingMode, currentPage, totalPages, canvasRef, textSlug, onDocumentLoad }: {
   book: PdfBook;
   pdfUrl: string;
   zoom: number;
@@ -230,15 +251,13 @@ function ContinuousViewer({ book, pdfUrl, zoom, rotation, readingMode, currentPa
   currentPage: number;
   totalPages: number;
   canvasRef: React.RefObject<PdfCanvasHandle | null>;
+  textSlug?: string;
   onDocumentLoad: (pages: number, hasText: boolean) => void;
 }) {
-  // Render first page with doc load callback; additional pages handled by stacking
-  // For simplicity render pages 1 through min(totalPages,10) + jump to current
-  const visiblePages = Array.from({ length: Math.min(totalPages || book.pages, 5) }, (_, i) => i + 1);
+  const _visiblePages = Array.from({ length: Math.min(totalPages || book.pages, 5) }, (_, i) => i + 1);
 
   return (
     <div className="space-y-4 py-4">
-      {/* First page loads the document */}
       <PdfCanvas
         ref={canvasRef}
         pdfUrl={pdfUrl}
@@ -247,6 +266,7 @@ function ContinuousViewer({ book, pdfUrl, zoom, rotation, readingMode, currentPa
         rotation={rotation}
         readingMode={readingMode}
         layout="single"
+        textSlug={textSlug}
         onDocumentLoad={onDocumentLoad}
       />
     </div>

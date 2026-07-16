@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
+import { useLocation } from 'wouter';
 import * as pdfjsLib from 'pdfjs-dist';
-import { Loader2, AlertCircle, FileText } from 'lucide-react';
+import { Loader2, AlertCircle, FileText, BookText } from 'lucide-react';
 
 // pdf.js v6 — use local worker served from /public
 pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.mjs';
@@ -19,6 +20,8 @@ interface Props {
   onDocumentLoad?: (pages: number, hasText: boolean) => void;
   readingMode?: 'dark' | 'sepia' | 'light';
   layout?: 'single' | 'double' | 'continuous';
+  /** When set, show a "Мәтін оқу" button on error pointing to /reader/:textSlug */
+  textSlug?: string;
 }
 
 const modeFilter: Record<string, string> = {
@@ -29,8 +32,9 @@ const modeFilter: Record<string, string> = {
 
 const PdfCanvas = forwardRef<PdfCanvasHandle, Props>(({
   pdfUrl, currentPage, zoom, rotation,
-  onDocumentLoad, readingMode = 'dark', layout = 'single',
+  onDocumentLoad, readingMode = 'dark', layout = 'single', textSlug,
 }, ref) => {
+  const [, navigate] = useLocation();
   const canvasRef  = useRef<HTMLCanvasElement>(null);
   const canvas2Ref = useRef<HTMLCanvasElement>(null);
   const docRef     = useRef<pdfjsLib.PDFDocumentProxy | null>(null);
@@ -156,7 +160,18 @@ const PdfCanvas = forwardRef<PdfCanvasHandle, Props>(({
         <AlertCircle size={40} className="text-orange-400" />
         <div>
           <p className="text-white font-semibold mb-1">PDF ашылмады</p>
-          <p className="text-gray-400 text-sm mb-3">{error}</p>
+          <p className="text-gray-400 text-sm mb-4">PDF файл сервер қоймасында жоқ</p>
+
+          {/* If a text version exists, offer navigation */}
+          {textSlug && (
+            <button
+              onClick={() => navigate(`/reader/${textSlug}`)}
+              className="flex items-center gap-2 mx-auto mb-4 px-5 py-2.5 rounded-xl bg-violet-500 hover:bg-violet-400 text-white font-medium transition-colors"
+            >
+              <BookText size={16} /> Мәтінді онлайн оқу
+            </button>
+          )}
+
           <div className="bg-blue-500/10 border border-blue-500/20 rounded-xl p-4 text-left max-w-sm">
             <div className="flex items-start gap-2">
               <FileText size={16} className="text-blue-400 flex-shrink-0 mt-0.5" />

@@ -3,11 +3,15 @@ import { useLocation } from 'wouter';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   BookOpen, Upload, Search, Trash2, Download, Lock, Clock,
-  FileType, User, Tag, ChevronRight, Plus, Layers,
+  FileType, User, Tag, ChevronRight, Plus, Layers, BookText,
 } from 'lucide-react';
 import { usePdfLibrary, type AnyBook } from '@/hooks/usePdfLibrary';
 import PdfUploadModal from '@/components/reader/PdfUploadModal';
 import type { StoredPdfBook } from '@/db/pdfStorage';
+import booksJson from '@/data/books.json';
+
+// Slugs that have fullText in books.json (digital reader)
+const TEXT_READER_SLUGS = new Set((booksJson as { slug: string }[]).map(b => b.slug));
 
 const GRADIENT_BY_CATEGORY: Record<string, string> = {
   'Классикалық әдебиет': 'from-violet-600 to-purple-800',
@@ -132,9 +136,18 @@ export default function PdfLibraryPage() {
                   key={book.slug}
                   book={book}
                   index={i}
-                  onOpen={() => navigate(`/reader/pdf/${book.slug}`)}
+                  onOpen={() => {
+                    // If digital text available, prefer text reader
+                    if (TEXT_READER_SLUGS.has(book.slug)) {
+                      navigate(`/reader/${book.slug}`);
+                    } else {
+                      navigate(`/reader/pdf/${book.slug}`);
+                    }
+                  }}
+                  onOpenPdf={TEXT_READER_SLUGS.has(book.slug) ? () => navigate(`/reader/pdf/${book.slug}`) : undefined}
                   onDelete={isUploaded(book) ? () => handleDelete(book.slug) : undefined}
                   deleting={deleting === book.slug}
+                  hasText={TEXT_READER_SLUGS.has(book.slug)}
                 />
               ))}
             </AnimatePresence>
@@ -169,12 +182,14 @@ export default function PdfLibraryPage() {
 }
 
 // ─── Book Card ────────────────────────────────────────────────
-function BookCard({ book, index, onOpen, onDelete, deleting }: {
+function BookCard({ book, index, onOpen, onOpenPdf, onDelete, deleting, hasText }: {
   book: AnyBook;
   index: number;
   onOpen: () => void;
+  onOpenPdf?: () => void;
   onDelete?: () => void;
   deleting: boolean;
+  hasText?: boolean;
 }) {
   const grad = getGrad(book.category);
   const initials = book.title.slice(0, 2).toUpperCase();
@@ -200,7 +215,8 @@ function BookCard({ book, index, onOpen, onDelete, deleting }: {
         {/* Overlay on hover */}
         <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
           <div className="opacity-0 group-hover:opacity-100 transition-all bg-white/15 backdrop-blur-sm rounded-xl px-3 py-1.5 flex items-center gap-1.5 text-white text-xs font-medium">
-            <BookOpen size={13} />Ашу
+            {hasText ? <BookText size={13} /> : <BookOpen size={13} />}
+            {hasText ? 'Мәтін оқу' : 'Ашу'}
           </div>
         </div>
         {/* Badges */}
@@ -243,6 +259,25 @@ function BookCard({ book, index, onOpen, onDelete, deleting }: {
             <Clock size={10} />{book.year}
           </p>
         )}
+
+        {/* Quick action buttons */}
+        <div className="flex gap-1.5 mt-2">
+          <button
+            onClick={onOpen}
+            className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-violet-500/20 hover:bg-violet-500/35 text-violet-300 text-[10px] font-medium transition-colors border border-violet-500/25"
+          >
+            {hasText ? <BookText size={10} /> : <BookOpen size={10} />}
+            {hasText ? 'Мәтін' : 'Ашу'}
+          </button>
+          {onOpenPdf && (
+            <button
+              onClick={e => { e.stopPropagation(); onOpenPdf(); }}
+              className="flex-1 flex items-center justify-center gap-1 py-1.5 rounded-lg bg-blue-500/15 hover:bg-blue-500/30 text-blue-300 text-[10px] font-medium transition-colors border border-blue-500/20"
+            >
+              <FileType size={10} />PDF
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Delete button (uploaded only) */}
