@@ -14,6 +14,8 @@ import WritersPage from '@/pages/writers/WritersPage';
 import WriterDetailPage from '@/pages/writers/WriterDetailPage';
 import ZhyrauPage from '@/pages/zhyrau/ZhyrauPage';
 import ZhyrauDetailPage from '@/pages/zhyrau/ZhyrauDetailPage';
+import BiPage from '@/pages/bi/BiPage';
+import BiDetailPage from '@/pages/bi/BiDetailPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -83,6 +85,13 @@ function Router() {
       </Route>
       <Route path="/writers/:slug">
         {() => <AppShell><WriterDetailPage /></AppShell>}
+      </Route>
+
+      <Route path="/bi-sheshender">
+        {() => <BiPage />}
+      </Route>
+      <Route path="/bi-sheshender/:slug">
+        {() => <BiDetailPage />}
       </Route>
 
       <Route path="/zhyrau">
