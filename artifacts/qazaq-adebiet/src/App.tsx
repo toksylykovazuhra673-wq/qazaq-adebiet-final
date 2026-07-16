@@ -24,6 +24,7 @@ import PdfReaderPage      from '@/pages/reader/PdfReaderPage';
 import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
 import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
 import AnalysisPage       from '@/pages/analysis/AnalysisPage';
+import InteractivePage    from '@/pages/interactive/InteractivePage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -148,6 +149,11 @@ function Router() {
       {/* Automatic Literary Analysis — /analysis/:workSlug (no AppShell — full screen) */}
       <Route path="/analysis/:workSlug">
         {() => <AnalysisPage />}
+      </Route>
+
+      {/* Interactive Learning Lab — /interactive */}
+      <Route path="/interactive">
+        {() => <InteractivePage />}
       </Route>
 
       <Route>
