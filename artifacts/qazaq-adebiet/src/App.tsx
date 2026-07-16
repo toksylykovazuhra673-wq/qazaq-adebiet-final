@@ -23,6 +23,7 @@ import WorkDetailPage from '@/pages/universal/WorkDetailPage';
 import PdfReaderPage      from '@/pages/reader/PdfReaderPage';
 import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
 import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
+import AnalysisPage       from '@/pages/analysis/AnalysisPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -142,6 +143,11 @@ function Router() {
       {/* Digital Reading System — /reader/:slug (no AppShell — immersive reader) */}
       <Route path="/reader/:slug">
         {() => <DigitalReaderPage />}
+      </Route>
+
+      {/* Automatic Literary Analysis — /analysis/:workSlug (no AppShell — full screen) */}
+      <Route path="/analysis/:workSlug">
+        {() => <AnalysisPage />}
       </Route>
 
       <Route>
