@@ -4,13 +4,13 @@ import { Search, Menu, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
-  { href: '/aqyndar', label: 'Ақындар' },
-  { href: '/zhazushylar', label: 'Жазушылар' },
-  { href: '/zhyraudar', label: 'Жыраулар' },
-  { href: '/kitapkhana', label: 'Кітапхана' },
-  { href: '/taldau', label: 'Талдау' },
-  { href: '/oyyndar', label: 'Ойындар' },
-  { href: '/olimpiada', label: 'Олимпиада' }
+  { href: '/poets',       label: 'Ақындар' },
+  { href: '/writers',     label: 'Жазушылар' },
+  { href: '/zhyrau',      label: 'Жыраулар' },
+  { href: '/reader',      label: 'Кітапхана' },
+  { href: '/analysis/abai-qara-sozder', label: 'Талдау' },
+  { href: '/interactive', label: 'Ойындар' },
+  { href: '/bi-sheshender', label: 'Би-шешендер' },
 ];
 
 export default function Header() {

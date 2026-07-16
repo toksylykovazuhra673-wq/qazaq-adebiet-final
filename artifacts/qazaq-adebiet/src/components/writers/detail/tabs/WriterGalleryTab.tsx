@@ -29,10 +29,10 @@ export default function WriterGalleryTab({ writer }: Props) {
   useEffect(() => {
     if (slideshow && lightboxIdx !== null) {
       slideshowRef.current = setInterval(next, 3000);
-      return () => { if (slideshowRef.current) clearInterval(slideshowRef.current); };
     } else {
       if (slideshowRef.current) clearInterval(slideshowRef.current);
     }
+    return () => { if (slideshowRef.current) clearInterval(slideshowRef.current); };
   }, [slideshow, lightboxIdx, next]);
 
   // Keyboard navigation

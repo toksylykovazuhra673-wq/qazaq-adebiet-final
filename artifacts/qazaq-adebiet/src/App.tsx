@@ -25,9 +25,7 @@ import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
 import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
 import AnalysisPage       from '@/pages/analysis/AnalysisPage';
 import InteractivePage    from '@/pages/interactive/InteractivePage';
-import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
-import PlaceholderPage from '@/pages/PlaceholderPage';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -59,27 +57,27 @@ function Router() {
       <Route path="/" component={HomePage} />
       
       {/* Other routes wrapped in AppShell */}
+      {/* Legacy URL aliases → canonical pages */}
       <Route path="/aqyndar">
-        {() => <AppShell><CategoryListPage /></AppShell>}
+        {() => <AppShell><PoetsPage /></AppShell>}
       </Route>
       <Route path="/zhazushylar">
-        {() => <AppShell><CategoryListPage /></AppShell>}
+        {() => <AppShell><WritersPage /></AppShell>}
       </Route>
       <Route path="/zhyraudar">
-        {() => <AppShell><CategoryListPage /></AppShell>}
+        {() => <AppShell><ZhyrauPage /></AppShell>}
       </Route>
       <Route path="/kitapkhana">
-        {() => <AppShell><CategoryListPage /></AppShell>}
+        {() => <AppShell><PdfLibraryPage /></AppShell>}
       </Route>
-      
       <Route path="/taldau">
-        {() => <AppShell><PlaceholderPage /></AppShell>}
+        {() => { window.location.replace('/analysis/abai-qara-sozder'); return null; }}
       </Route>
       <Route path="/oyyndar">
-        {() => <AppShell><PlaceholderPage /></AppShell>}
+        {() => <InteractivePage />}
       </Route>
       <Route path="/olimpiada">
-        {() => <AppShell><PlaceholderPage /></AppShell>}
+        {() => <InteractivePage />}
       </Route>
       
       <Route path="/poets">

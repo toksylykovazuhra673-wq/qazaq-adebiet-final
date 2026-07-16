@@ -23,7 +23,7 @@ export default function WriterDetailHero({ writer }: { writer: Writer }) {
   const [copied, setCopied] = useState(false);
 
   const toggleFavorite = useCallback(() => {
-    setFavorited((prev) => {
+    setFavorited((prev: boolean) => {
       const next = !prev;
       try {
         const favs: string[] = JSON.parse(localStorage.getItem('writer_favorites') || '[]');

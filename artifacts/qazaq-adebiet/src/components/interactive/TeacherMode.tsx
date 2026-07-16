@@ -116,7 +116,7 @@ export default function TeacherMode({ customTasks, onAdd, onUpdate, onDelete, on
                     <label className="text-white/50 text-xs mb-1 block">{f.label}</label>
                     <input
                       type={f.type}
-                      value={(editing as Record<string, unknown>)[f.key] as string ?? ''}
+                      value={(editing as unknown as Record<string, unknown>)[f.key] as string ?? ''}
                       onChange={(e) => patch(f.key as keyof TaskDraft, e.target.value)}
                       className="w-full px-3 py-2.5 rounded-xl border border-white/15 bg-white/5 text-white text-sm outline-none focus:border-violet-500/50"
                     />

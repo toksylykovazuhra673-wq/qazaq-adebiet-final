@@ -39,11 +39,11 @@ export default function PdfViewTab({ book, currentPage, onPageChange }: Props) {
       {/* Mini toolbar */}
       <div className="flex items-center justify-between px-4 py-2 border-b border-white/8 bg-gray-950/60 backdrop-blur-sm flex-shrink-0">
         <div className="flex items-center gap-1">
-          <NavBtn onClick={() => { const p = Math.max(1, currentPage - 1); onPageChange(p); canvasRef.current?.goToPage(p); }} disabled={currentPage <= 1}>
+          <NavBtn onClick={() => onPageChange(Math.max(1, currentPage - 1))} disabled={currentPage <= 1}>
             <ChevronLeft size={15} />
           </NavBtn>
           <span className="text-white text-xs px-2">{currentPage} / {total || '—'}</span>
-          <NavBtn onClick={() => { const p = Math.min(total || 9999, currentPage + 1); onPageChange(p); canvasRef.current?.goToPage(p); }} disabled={total > 0 && currentPage >= total}>
+          <NavBtn onClick={() => onPageChange(Math.min(total || 9999, currentPage + 1))} disabled={total > 0 && currentPage >= total}>
             <ChevronRight size={15} />
           </NavBtn>
         </div>
@@ -73,10 +73,8 @@ export default function PdfViewTab({ book, currentPage, onPageChange }: Props) {
           currentPage={currentPage}
           zoom={zoom}
           rotation={rotation}
-          readingMode="single"
+          readingMode="dark"
           onDocumentLoad={(pages) => { setTotal(pages); }}
-          onPageChange={onPageChange}
-          onTextExtracted={() => {}}
         />
       </div>
     </div>
