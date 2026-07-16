@@ -16,6 +16,8 @@ import ZhyrauPage from '@/pages/zhyrau/ZhyrauPage';
 import ZhyrauDetailPage from '@/pages/zhyrau/ZhyrauDetailPage';
 import BiPage from '@/pages/bi/BiPage';
 import BiDetailPage from '@/pages/bi/BiDetailPage';
+import EducatorPage from '@/pages/educator/EducatorPage';
+import EducatorDetailPage from '@/pages/educator/EducatorDetailPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -92,6 +94,13 @@ function Router() {
       </Route>
       <Route path="/bi-sheshender/:slug">
         {() => <BiDetailPage />}
+      </Route>
+
+      <Route path="/educators">
+        {() => <AppShell><EducatorPage /></AppShell>}
+      </Route>
+      <Route path="/educators/:slug">
+        {() => <AppShell><EducatorDetailPage /></AppShell>}
       </Route>
 
       <Route path="/zhyrau">
