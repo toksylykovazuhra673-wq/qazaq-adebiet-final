@@ -1,10 +1,11 @@
 /**
  * useZhyrau — single source of truth for all zhyrau data.
  *
- * Adding a new zhyrau to src/data/zhyrau.json is all that is needed —
- * no code changes anywhere else are required.
+ * Supports both static JSON data and custom zhyrau added via the UI (stored in localStorage).
+ * To add a permanent zhyrau: add an object to src/data/zhyrau.json.
+ * To add a temporary zhyrau: use saveCustomZhyrau() — it persists in localStorage.
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import rawZhyrau from '@/data/zhyrau.json';
 import type {
   Zhyrau,
@@ -15,6 +16,55 @@ import type {
 } from '@/types/zhyrau';
 
 export const ALL_ZHYRAU = rawZhyrau as Zhyrau[];
+
+const LS_KEY = 'qazaq_adebiet_custom_zhyrau';
+const CHANGE_EVENT = 'zhyrau-data-changed';
+
+// ── localStorage helpers ───────────────────────────────────────────────────────
+
+export function loadCustomZhyrau(): Zhyrau[] {
+  try {
+    const stored = localStorage.getItem(LS_KEY);
+    return stored ? (JSON.parse(stored) as Zhyrau[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomZhyrau(zhyrau: Zhyrau): void {
+  try {
+    const existing = loadCustomZhyrau();
+    const updated = [...existing.filter((z) => z.slug !== zhyrau.slug), zhyrau];
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+  } catch {
+    // ignore
+  }
+}
+
+export function deleteCustomZhyrau(slug: string): void {
+  try {
+    const existing = loadCustomZhyrau();
+    const updated = existing.filter((z) => z.slug !== slug);
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+  } catch {
+    // ignore
+  }
+}
+
+/** Returns a merged list: static JSON + custom localStorage */
+function useAllZhyrau(): Zhyrau[] {
+  const [custom, setCustom] = useState<Zhyrau[]>(() => loadCustomZhyrau());
+
+  useEffect(() => {
+    const handler = () => setCustom(loadCustomZhyrau());
+    window.addEventListener(CHANGE_EVENT, handler);
+    return () => window.removeEventListener(CHANGE_EVENT, handler);
+  }, []);
+
+  return useMemo(() => [...ALL_ZHYRAU, ...custom], [custom]);
+}
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
@@ -58,6 +108,8 @@ function sortZhyrau(list: Zhyrau[], sort: ZhyrauSortOption): Zhyrau[] {
 // ── hook ──────────────────────────────────────────────────────────────────────
 
 export function useZhyrau() {
+  const allZhyrau = useAllZhyrau();
+
   const [filter, setFilter] = useState<ZhyrauFilter>({
     search: '',
     century: 'all',
@@ -66,30 +118,31 @@ export function useZhyrau() {
   });
 
   const filtered = useMemo(() => {
-    let result = ALL_ZHYRAU.filter((z) => {
+    let result = allZhyrau.filter((z) => {
       if (!matchesSearch(z, filter.search)) return false;
       if (filter.century !== 'all' && z.century !== filter.century) return false;
       if (filter.period !== 'all' && z.historicalPeriod !== filter.period) return false;
       return true;
     });
     return sortZhyrau(result, filter.sort);
-  }, [filter]);
+  }, [allZhyrau, filter]);
 
   const suggestions = useMemo(() => {
     if (!filter.search || filter.search.length < 2) return [];
     const term = filter.search.toLowerCase();
-    return ALL_ZHYRAU.filter(
-      (z) =>
-        z.fullName.toLowerCase().includes(term) ||
-        z.nickname.toLowerCase().includes(term),
-    )
+    return allZhyrau
+      .filter(
+        (z) =>
+          z.fullName.toLowerCase().includes(term) ||
+          z.nickname.toLowerCase().includes(term),
+      )
       .slice(0, 6)
       .map((z) => ({ slug: z.slug, label: z.fullName }));
-  }, [filter.search]);
+  }, [allZhyrau, filter.search]);
 
   return {
     zhyrauList: filtered,
-    total: ALL_ZHYRAU.length,
+    total: allZhyrau.length,
     filter,
     suggestions,
     setFilter: (partial: Partial<ZhyrauFilter>) =>
@@ -100,18 +153,20 @@ export function useZhyrau() {
 }
 
 export function useZhyrauBySlug(slug: string | undefined): Zhyrau | undefined {
+  const allZhyrau = useAllZhyrau();
   return useMemo(
-    () => (slug ? ALL_ZHYRAU.find((z) => z.slug === slug) : undefined),
-    [slug],
+    () => (slug ? allZhyrau.find((z) => z.slug === slug) : undefined),
+    [allZhyrau, slug],
   );
 }
 
 export function useRelatedZhyrau(slugs: string[]): Zhyrau[] {
+  const allZhyrau = useAllZhyrau();
   return useMemo(
     () =>
       slugs
-        .map((s) => ALL_ZHYRAU.find((z) => z.slug === s))
+        .map((s) => allZhyrau.find((z) => z.slug === s))
         .filter((z): z is Zhyrau => Boolean(z)),
-    [slugs],
+    [allZhyrau, slugs],
   );
 }
