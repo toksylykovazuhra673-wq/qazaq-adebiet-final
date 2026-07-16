@@ -71,9 +71,9 @@ export default function WorksTab({ author }: Props) {
 
             {work.year && <p className="text-gray-500 text-xs mb-2">{work.year}</p>}
 
-            {work.description && (
+            {('description' in work) && (work as any).description && (
               <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
-                {work.description}
+                {(work as any).description}
               </p>
             )}
 
