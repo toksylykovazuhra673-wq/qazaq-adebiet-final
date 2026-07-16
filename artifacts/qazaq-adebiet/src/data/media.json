@@ -1,0 +1,29 @@
+{
+  "featured": [
+    {
+      "id": 1,
+      "type": "video",
+      "title": "Абай туралы деректі фильм",
+      "authorSlug": "abai-kunanbayuly-u",
+      "url": "",
+      "thumbnail": "",
+      "duration": "45:00"
+    },
+    {
+      "id": 2,
+      "type": "audio",
+      "title": "«Абай жолы» романы — аудиокітап",
+      "authorSlug": "mukhtar-auezov-u",
+      "url": "",
+      "duration": "12:30:00"
+    },
+    {
+      "id": 3,
+      "type": "pdf",
+      "title": "Қара сөздер — толық мәтін",
+      "authorSlug": "abai-kunanbayuly-u",
+      "url": "",
+      "pages": 120
+    }
+  ]
+}
