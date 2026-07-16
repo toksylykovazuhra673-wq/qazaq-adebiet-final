@@ -20,7 +20,8 @@ import EducatorPage from '@/pages/educator/EducatorPage';
 import EducatorDetailPage from '@/pages/educator/EducatorDetailPage';
 import UniversalAuthorPage from '@/pages/universal/UniversalAuthorPage';
 import WorkDetailPage from '@/pages/universal/WorkDetailPage';
-import PdfReaderPage from '@/pages/reader/PdfReaderPage';
+import PdfReaderPage   from '@/pages/reader/PdfReaderPage';
+import PdfLibraryPage  from '@/pages/reader/PdfLibraryPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -125,6 +126,11 @@ function Router() {
       {/* Work Detail Page — /works/:slug */}
       <Route path="/works/:slug">
         {() => <AppShell><WorkDetailPage /></AppShell>}
+      </Route>
+
+      {/* PDF Library — /reader */}
+      <Route path="/reader">
+        {() => <AppShell><PdfLibraryPage /></AppShell>}
       </Route>
 
       {/* Professional PDF Reader — /reader/pdf/:slug (no AppShell — full screen reader) */}

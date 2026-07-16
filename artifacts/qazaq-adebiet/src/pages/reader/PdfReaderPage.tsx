@@ -6,6 +6,7 @@ import { AlertCircle, BookOpen } from 'lucide-react';
 import pdfLibrary from '@/data/pdf-library.json';
 import type { PdfBook } from '@/types/pdf-reader';
 import { usePdfReader } from '@/hooks/usePdfReader';
+import { getUploadedBook, getObjectUrl } from '@/db/pdfStorage';
 import type { PdfCanvasHandle } from '@/components/reader/PdfCanvas';
 import PdfCanvas       from '@/components/reader/PdfCanvas';
 import ReaderHeader    from '@/components/reader/ReaderHeader';
@@ -13,13 +14,45 @@ import ReaderToolbar   from '@/components/reader/ReaderToolbar';
 import ReaderSidebar   from '@/components/reader/ReaderSidebar';
 import SearchPanel     from '@/components/reader/SearchPanel';
 
-const books = pdfLibrary as PdfBook[];
+const staticBooks = pdfLibrary as PdfBook[];
 
 export default function PdfReaderPage() {
-  const params   = useParams<{ slug: string }>();
-  const slug     = params.slug ?? '';
-  const book     = books.find(b => b.slug === slug);
+  const params    = useParams<{ slug: string }>();
+  const slug      = params.slug ?? '';
   const canvasRef = useRef<PdfCanvasHandle>(null);
+
+  // Resolve book: static JSON first, then IndexedDB
+  const [book, setBook]       = useState<PdfBook | null>(() => staticBooks.find(b => b.slug === slug) ?? null);
+  const [pdfUrl, setPdfUrl]   = useState<string>('');
+  const [resolving, setResolving] = useState(!book);
+
+  useEffect(() => {
+    let objectUrl = '';
+    const resolve = async () => {
+      // 1. Static book?
+      const staticBook = staticBooks.find(b => b.slug === slug);
+      if (staticBook) {
+        setBook(staticBook);
+        setPdfUrl(`/pdf/${staticBook.pdfFile}`);
+        setResolving(false);
+        return;
+      }
+      // 2. Uploaded book in IndexedDB?
+      const uploaded = await getUploadedBook(slug);
+      if (uploaded) {
+        setBook(uploaded);
+        objectUrl = (await getObjectUrl(slug)) ?? '';
+        setPdfUrl(objectUrl);
+        setResolving(false);
+        return;
+      }
+      // 3. Not found
+      setBook(null);
+      setResolving(false);
+    };
+    resolve();
+    return () => { if (objectUrl) URL.revokeObjectURL(objectUrl); };
+  }, [slug]);
 
   const [totalPages, setTotalPages] = useState(book?.pages ?? 0);
   const [hasText, setHasText]       = useState(false);
@@ -47,18 +80,23 @@ export default function PdfReaderPage() {
     };
   }, [reader]);
 
+  if (resolving) {
+    return (
+      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+        <div className="animate-spin rounded-full h-10 w-10 border-2 border-violet-400 border-t-transparent" />
+      </div>
+    );
+  }
+
   if (!book) {
     return (
       <div className="min-h-screen bg-gray-950 flex flex-col items-center justify-center text-center px-4 gap-4">
         <AlertCircle size={48} className="text-orange-400" />
         <h1 className="text-2xl font-bold text-white">Кітап табылмады</h1>
         <p className="text-gray-400">«{slug}» атты PDF кітапхананда жоқ.</p>
-        <p className="text-gray-500 text-sm font-mono">src/data/pdf-library.json файлын тексеріңіз.</p>
       </div>
     );
   }
-
-  const pdfUrl = `/pdf/${book.pdfFile}`;
   const isBookmarked = persistent.bookmarks.some(b => b.page === state.currentPage);
 
   // Background colors by mode
