@@ -43,15 +43,26 @@ export interface WriterArticle {
   description: string;
 }
 
+export interface WriterTranslation {
+  id: number;
+  title: string;
+  originalLanguage: string;
+  year: string;
+  author: string;
+  description?: string;
+}
+
 export interface WriterQuote {
   id: number;
   text: string;
+  source?: string;
 }
 
 export interface WriterGalleryItem {
   id: number;
   url: string;
   caption: string;
+  year?: string;
 }
 
 export interface WriterVideo {
@@ -67,6 +78,8 @@ export interface WriterAudio {
   title: string;
   url: string;
   duration: string;
+  coverImage?: string;
+  narrator?: string;
 }
 
 export interface WriterPdf {
@@ -75,12 +88,47 @@ export interface WriterPdf {
   url: string;
   pages: number;
   size: string;
+  coverImage?: string;
 }
 
 export interface WriterTimelineEvent {
   year: string;
   title: string;
   description: string;
+  category?: 'birth' | 'education' | 'work' | 'award' | 'death' | 'travel' | 'other';
+}
+
+export interface WriterFamilyMember {
+  name: string;
+  relation: string;
+  years?: string;
+  note?: string;
+  photo?: string;
+}
+
+export interface WriterEducationItem {
+  institution: string;
+  degree: string;
+  years: string;
+  city?: string;
+  note?: string;
+}
+
+export interface WriterCareerItem {
+  position: string;
+  organization: string;
+  years: string;
+  city?: string;
+  note?: string;
+}
+
+export interface WriterBibliographyItem {
+  id: number;
+  title: string;
+  author?: string;
+  year?: string;
+  publisher?: string;
+  type: 'book' | 'article' | 'dissertation' | 'online' | 'other';
 }
 
 export interface Writer {
@@ -123,12 +171,19 @@ export interface Writer {
   stories: WriterStory[];
   plays: WriterPlay[];
   articles: WriterArticle[];
+  translations?: WriterTranslation[];
   quotes: WriterQuote[];
   gallery: WriterGalleryItem[];
   videos: WriterVideo[];
   audio: WriterAudio[];
   pdf: WriterPdf[];
+  family?: WriterFamilyMember[];
+  education?: WriterEducationItem[];
+  career?: WriterCareerItem[];
+  bibliography?: WriterBibliographyItem[];
   interestingFacts: string[];
+  /** Olympiad-style questions about this writer */
+  olympiadQuestions?: { id: number; question: string; answer: string; difficulty: 'easy' | 'medium' | 'hard' }[];
   /** Array of slugs referencing related writers */
   relatedWriters: string[];
 }
@@ -154,6 +209,7 @@ export type WriterGenreFilter =
   | 'Балалар әдебиеті'
   | 'Тарихи шығарма';
 export type WriterSortOption = 'alpha' | 'birthYear' | 'viewCount' | 'popular' | 'addedDate';
+export type WriterSpecialFilter = 'all' | 'alash' | 'soviet' | 'children' | 'drama' | 'poet-writer' | 'featured';
 
 export interface WritersFilter {
   search: string;
@@ -161,4 +217,14 @@ export interface WritersFilter {
   movement: WriterMovementFilter;
   genre: WriterGenreFilter;
   sort: WriterSortOption;
+  alphabet: string;
+  specialFilter: WriterSpecialFilter;
+}
+
+export interface WritersStats {
+  totalWriters: number;
+  totalWorks: number;
+  totalPdf: number;
+  totalAudio: number;
+  totalQuotes: number;
 }

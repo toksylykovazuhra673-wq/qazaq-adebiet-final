@@ -14,9 +14,20 @@ import type {
   WriterMovementFilter,
   WriterGenreFilter,
   WriterSortOption,
+  WriterSpecialFilter,
+  WritersStats,
 } from '@/types/writer';
 
 const ALL_WRITERS = rawWriters as Writer[];
+
+// ── Derived global stats ──────────────────────────────────────────────────────
+export const WRITERS_STATS: WritersStats = {
+  totalWriters: ALL_WRITERS.length,
+  totalWorks:   ALL_WRITERS.reduce((sum, w) => sum + (w.worksCount ?? 0), 0),
+  totalPdf:     ALL_WRITERS.reduce((sum, w) => sum + (w.pdf?.length ?? 0), 0),
+  totalAudio:   ALL_WRITERS.reduce((sum, w) => sum + (w.audio?.length ?? 0), 0),
+  totalQuotes:  ALL_WRITERS.reduce((sum, w) => sum + (w.quotesCount ?? 0), 0),
+};
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -33,8 +44,28 @@ function matchesSearch(writer: Writer, q: string): boolean {
     writer.literaryMovement.toLowerCase().includes(term) ||
     writer.genre.some((g) => g.toLowerCase().includes(term)) ||
     writer.tags.some((t) => t.toLowerCase().includes(term)) ||
-    writer.description.toLowerCase().includes(term)
+    writer.description.toLowerCase().includes(term) ||
+    writer.birthPlace.toLowerCase().includes(term) ||
+    writer.works.some((wk) => wk.title.toLowerCase().includes(term))
   );
+}
+
+function matchesAlphabet(writer: Writer, letter: string): boolean {
+  if (!letter) return true;
+  return writer.fullName.startsWith(letter);
+}
+
+function matchesSpecial(writer: Writer, special: WriterSpecialFilter): boolean {
+  switch (special) {
+    case 'all':         return true;
+    case 'alash':       return writer.literaryMovement === 'Алаш';
+    case 'soviet':      return writer.literaryMovement === 'Кеңес дәуірі';
+    case 'children':    return writer.genre.includes('Балалар әдебиеті');
+    case 'drama':       return writer.genre.includes('Пьеса') || writer.profession.includes('Драматург');
+    case 'poet-writer': return writer.profession.includes('Ақын') || writer.profession.includes('Жазушы');
+    case 'featured':    return writer.featured;
+    default:            return true;
+  }
 }
 
 function matchesGenre(writer: Writer, genre: WriterGenreFilter): boolean {
@@ -71,6 +102,8 @@ export function useWriters() {
     movement: 'all',
     genre: 'all',
     sort: 'alpha',
+    alphabet: '',
+    specialFilter: 'all',
   });
 
   const filtered = useMemo(() => {
@@ -79,6 +112,8 @@ export function useWriters() {
       if (filter.century !== 'all' && writer.century !== filter.century) return false;
       if (filter.movement !== 'all' && writer.literaryMovement !== filter.movement) return false;
       if (!matchesGenre(writer, filter.genre)) return false;
+      if (!matchesAlphabet(writer, filter.alphabet)) return false;
+      if (!matchesSpecial(writer, filter.specialFilter)) return false;
       return true;
     });
     return sortWriters(result, filter.sort);
@@ -88,37 +123,52 @@ export function useWriters() {
   const suggestions = useMemo(() => {
     if (!filter.search || filter.search.length < 2) return [];
     const term = filter.search.toLowerCase();
-    return ALL_WRITERS.filter(
-      (w) =>
-        w.fullName.toLowerCase().includes(term) ||
-        w.shortName.toLowerCase().includes(term),
-    )
-      .slice(0, 6)
-      .map((w) => ({ slug: w.slug, label: w.fullName }));
+    const matches: { slug: string; label: string; type: string }[] = [];
+
+    ALL_WRITERS.forEach((w) => {
+      if (w.fullName.toLowerCase().includes(term) || w.shortName.toLowerCase().includes(term)) {
+        matches.push({ slug: w.slug, label: w.fullName, type: 'Жазушы' });
+      }
+      // Also suggest matching works
+      w.works.forEach((wk) => {
+        if (wk.title.toLowerCase().includes(term)) {
+          matches.push({ slug: w.slug, label: `${wk.title} — ${w.shortName}`, type: 'Шығарма' });
+        }
+      });
+    });
+
+    return matches.slice(0, 8);
   }, [filter.search]);
 
+  /** All unique first letters for alphabet filter */
+  const alphabetLetters = useMemo(() => {
+    const letters = new Set(ALL_WRITERS.map((w) => w.fullName.charAt(0)));
+    return [...letters].sort((a, b) => a.localeCompare(b, 'kk'));
+  }, []);
+
+  const hasActiveFilters =
+    filter.search !== '' ||
+    filter.century !== 'all' ||
+    filter.movement !== 'all' ||
+    filter.genre !== 'all' ||
+    filter.alphabet !== '' ||
+    filter.specialFilter !== 'all';
+
   return {
-    /** Filtered + sorted list — derived entirely from writers.json */
     writers: filtered,
-    /** Total number of writers in the JSON */
     total: ALL_WRITERS.length,
-    /** Current filter state */
     filter,
-    /** Autocomplete suggestions */
     suggestions,
-    /** Update one or more filter fields */
+    alphabetLetters,
+    hasActiveFilters,
+    stats: WRITERS_STATS,
     setFilter: (partial: Partial<WritersFilter>) =>
       setFilter((prev) => ({ ...prev, ...partial })),
-    /** Reset all filters */
     resetFilter: () =>
-      setFilter({ search: '', century: 'all', movement: 'all', genre: 'all', sort: 'alpha' }),
+      setFilter({ search: '', century: 'all', movement: 'all', genre: 'all', sort: 'alpha', alphabet: '', specialFilter: 'all' }),
   };
 }
 
-/**
- * Get a single writer by slug — reads directly from writers.json.
- * Returns undefined if the slug doesn't exist.
- */
 export function useWriterBySlug(slug: string | undefined): Writer | undefined {
   return useMemo(
     () => (slug ? ALL_WRITERS.find((w) => w.slug === slug) : undefined),
@@ -126,9 +176,6 @@ export function useWriterBySlug(slug: string | undefined): Writer | undefined {
   );
 }
 
-/**
- * Get related writers for a given writer (by relatedWriters slug array).
- */
 export function useRelatedWriters(slugs: string[]): Writer[] {
   return useMemo(
     () =>
@@ -139,5 +186,4 @@ export function useRelatedWriters(slugs: string[]): Writer[] {
   );
 }
 
-/** Expose the raw list for use outside components (e.g. stats). */
 export { ALL_WRITERS };
