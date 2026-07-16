@@ -1,0 +1,42 @@
+[
+  {
+    "id": "aqyndar",
+    "label": "Ақындар",
+    "description": "Қазақтың ұлы ақындары",
+    "icon": "feather",
+    "count": 89,
+    "color": "#6366f1"
+  },
+  {
+    "id": "zhazushylar",
+    "label": "Жазушылар",
+    "description": "Прозашылар мен романистер",
+    "icon": "book-open",
+    "count": 67,
+    "color": "#8b5cf6"
+  },
+  {
+    "id": "zhyraudar",
+    "label": "Жыраулар",
+    "description": "Ежелгі жыраулық дәстүр",
+    "icon": "music",
+    "count": 34,
+    "color": "#a78bfa"
+  },
+  {
+    "id": "biler",
+    "label": "Билер",
+    "description": "Шешен билер мен даналар",
+    "icon": "scale",
+    "count": 28,
+    "color": "#7c3aed"
+  },
+  {
+    "id": "agartushylar",
+    "label": "Ағартушылар",
+    "description": "Халық ағартушылары",
+    "icon": "lamp",
+    "count": 30,
+    "color": "#4f46e5"
+  }
+]
