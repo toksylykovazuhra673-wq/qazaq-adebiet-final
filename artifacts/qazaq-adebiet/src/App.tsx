@@ -10,6 +10,8 @@ import Footer from '@/components/Footer';
 import HomePage from '@/pages/HomePage';
 import PoetsPage from '@/pages/poets/PoetsPage';
 import PoetDetailPage from '@/pages/poets/PoetDetailPage';
+import WritersPage from '@/pages/writers/WritersPage';
+import WriterDetailPage from '@/pages/writers/WriterDetailPage';
 import CategoryListPage from '@/pages/CategoryListPage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import PlaceholderPage from '@/pages/PlaceholderPage';
@@ -73,7 +75,14 @@ function Router() {
       <Route path="/poets/:slug">
         {() => <AppShell><PoetDetailPage /></AppShell>}
       </Route>
-      
+
+      <Route path="/writers">
+        {() => <AppShell><WritersPage /></AppShell>}
+      </Route>
+      <Route path="/writers/:slug">
+        {() => <AppShell><WriterDetailPage /></AppShell>}
+      </Route>
+
       <Route path="/author/:slug">
         {() => <AppShell><AuthorDetailPage /></AppShell>}
       </Route>
