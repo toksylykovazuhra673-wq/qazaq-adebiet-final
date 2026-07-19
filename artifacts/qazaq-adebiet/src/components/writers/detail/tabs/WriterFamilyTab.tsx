@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Users } from 'lucide-react';
 import type { Writer, WriterFamilyMember } from '@/types/writer';
+import WriterPdfLinkSection from '@/components/writers/detail/WriterPdfLinkSection';
 
 const RELATION_ICONS: Record<string, string> = {
   'Әкесі': '👨', 'Анасы': '👩', 'Зайыбы': '💑', 'Жары': '💑',
@@ -32,9 +33,12 @@ export default function WriterFamilyTab({ writer }: { writer: Writer }) {
 
   if (members.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <Users size={40} className="text-white/15 mb-4" />
-        <p className="text-white/30">Отбасы туралы мәлімет толықтырылуда</p>
+      <div className="max-w-2xl">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Users size={40} className="text-white/15 mb-4" />
+          <p className="text-white/30">Отбасы туралы мәлімет толықтырылуда</p>
+        </div>
+        <WriterPdfLinkSection writerSlug={writer.slug} section="family" />
       </div>
     );
   }
@@ -49,6 +53,7 @@ export default function WriterFamilyTab({ writer }: { writer: Writer }) {
           </motion.div>
         ))}
       </div>
+      <WriterPdfLinkSection writerSlug={writer.slug} section="family" />
     </div>
   );
 }

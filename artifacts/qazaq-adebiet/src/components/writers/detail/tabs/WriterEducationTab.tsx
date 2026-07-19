@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { GraduationCap } from 'lucide-react';
 import type { Writer, WriterEducationItem } from '@/types/writer';
+import WriterPdfLinkSection from '@/components/writers/detail/WriterPdfLinkSection';
 
 function EducationCard({ item, index }: { item: WriterEducationItem; index: number }) {
   return (
@@ -41,9 +42,12 @@ export default function WriterEducationTab({ writer }: { writer: Writer }) {
 
   if (items.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center py-20 text-center">
-        <GraduationCap size={40} className="text-white/15 mb-4" />
-        <p className="text-white/30">Білімі туралы мәлімет толықтырылуда</p>
+      <div className="max-w-2xl">
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <GraduationCap size={40} className="text-white/15 mb-4" />
+          <p className="text-white/30">Білімі туралы мәлімет толықтырылуда</p>
+        </div>
+        <WriterPdfLinkSection writerSlug={writer.slug} section="education" />
       </div>
     );
   }
@@ -54,6 +58,7 @@ export default function WriterEducationTab({ writer }: { writer: Writer }) {
       <div>
         {items.map((item, i) => <EducationCard key={i} item={item} index={i} />)}
       </div>
+      <WriterPdfLinkSection writerSlug={writer.slug} section="education" />
     </div>
   );
 }

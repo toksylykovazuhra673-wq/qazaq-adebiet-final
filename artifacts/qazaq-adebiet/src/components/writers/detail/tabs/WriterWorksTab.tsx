@@ -1,6 +1,7 @@
 import React from 'react';
-import { BookOpen, Headphones, FileText } from 'lucide-react';
+import { Headphones } from 'lucide-react';
 import type { Writer } from '@/types/writer';
+import { WorkActions } from '@/components/writers/detail/WorkPdfManager';
 
 export default function WriterWorksTab({ writer }: { writer: Writer }) {
   if (!writer.works || writer.works.length === 0) {
@@ -23,7 +24,7 @@ export default function WriterWorksTab({ writer }: { writer: Writer }) {
               <th className="p-4 text-white/50 font-medium text-sm w-24">Жылы</th>
               <th className="p-4 text-white/50 font-medium text-sm w-32">Жанры</th>
               <th className="p-4 text-white/50 font-medium text-sm">Сипаттамасы</th>
-              <th className="p-4 text-white/50 font-medium text-sm w-48 text-right">Батырмалар</th>
+              <th className="p-4 text-white/50 font-medium text-sm w-56 text-right">Батырмалар</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-white/5">
@@ -38,24 +39,16 @@ export default function WriterWorksTab({ writer }: { writer: Writer }) {
                   </span>
                 </td>
                 <td className="p-4 text-white/60 text-sm line-clamp-2 md:line-clamp-none">{work.description}</td>
-                <td className="p-4 text-right">
-                  <div className="flex justify-end gap-2">
-                    {work.hasRead && (
-                      <button className="w-8 h-8 rounded-lg bg-primary/20 hover:bg-primary text-white flex items-center justify-center transition-colors" title="Оқу">
-                        <BookOpen className="w-4 h-4" />
-                      </button>
-                    )}
-                    {work.hasPdf && (
-                      <button className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors" title="PDF">
-                        <FileText className="w-4 h-4" />
-                      </button>
-                    )}
-                    {work.hasAudio && (
-                      <button className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors" title="Аудио">
-                        <Headphones className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
+                <td className="p-4">
+                  <WorkActions
+                    workId={String(work.id)}
+                    workTitle={work.title}
+                    writerSlug={writer.slug}
+                    hasRead={work.hasRead}
+                    hasPdf={work.hasPdf}
+                    hasAudio={work.hasAudio}
+                    compact
+                  />
                 </td>
               </tr>
             ))}
@@ -79,24 +72,21 @@ export default function WriterWorksTab({ writer }: { writer: Writer }) {
                 </span>
               </div>
               <p className="text-white/60 text-sm">{work.description}</p>
-              
-              <div className="flex gap-2 mt-2 pt-2 border-t border-white/5">
-                {work.hasRead && (
-                  <button className="flex-1 py-1.5 rounded-lg bg-primary/20 hover:bg-primary text-white text-xs flex items-center justify-center gap-1 transition-colors">
-                    <BookOpen className="w-3 h-3" /> Оқу
-                  </button>
-                )}
-                {work.hasPdf && (
-                  <button className="flex-1 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs flex items-center justify-center gap-1 transition-colors">
-                    <FileText className="w-3 h-3" /> PDF
-                  </button>
-                )}
-                {work.hasAudio && (
+              {work.hasAudio && (
+                <div className="flex gap-2 mt-1">
                   <button className="flex-1 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 text-white text-xs flex items-center justify-center gap-1 transition-colors">
                     <Headphones className="w-3 h-3" /> Аудио
                   </button>
-                )}
-              </div>
+                </div>
+              )}
+              <WorkActions
+                workId={String(work.id)}
+                workTitle={work.title}
+                writerSlug={writer.slug}
+                hasRead={work.hasRead}
+                hasPdf={work.hasPdf}
+                compact={false}
+              />
             </div>
           ))}
         </div>
