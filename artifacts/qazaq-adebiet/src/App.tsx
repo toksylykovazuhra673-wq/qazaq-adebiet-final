@@ -23,6 +23,7 @@ import WorkDetailPage from '@/pages/universal/WorkDetailPage';
 import PdfReaderPage      from '@/pages/reader/PdfReaderPage';
 import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
 import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
+import WorkPdfReaderPage  from '@/pages/reader/WorkPdfReaderPage';
 import AnalysisPage       from '@/pages/analysis/AnalysisPage';
 import FreeAnalysisPage   from '@/pages/analysis/FreeAnalysisPage';
 import InteractivePage    from '@/pages/interactive/InteractivePage';
@@ -143,6 +144,11 @@ function Router() {
       {/* Digital Reading System — /reader/:slug (no AppShell — immersive reader) */}
       <Route path="/reader/:slug">
         {() => <DigitalReaderPage />}
+      </Route>
+
+      {/* Uploaded-PDF full-page reader — /shygarma/:ownerSlug/:itemId */}
+      <Route path="/shygarma/:ownerSlug/:itemId">
+        {() => <WorkPdfReaderPage />}
       </Route>
 
       {/* Free text poem analyzer — /analysis (no workSlug) */}

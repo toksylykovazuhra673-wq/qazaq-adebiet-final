@@ -5,17 +5,17 @@ import {
   Plus, Trash2, Check, ExternalLink, BookOpen,
   Link, Upload, AlertCircle, Loader2,
 } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { useWorkPdf } from '@/hooks/useWriterPdfs';
 
 const MAX_FILE_BYTES = 10 * 1024 * 1024; // 10 MB
 
-// ── Full-screen PDF viewer ────────────────────────────────────
+// ── WorkPdfViewer — kept as a standalone export for legacy use ──
 export function WorkPdfViewer({
   url, title, onClose,
 }: { url: string; title: string; onClose: () => void }) {
   const [zoom, setZoom] = useState(100);
   const isBase64 = url.startsWith('data:');
-
   return (
     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
       className="fixed inset-0 z-[300] bg-black/92 flex flex-col">
@@ -64,7 +64,7 @@ export function WorkPdfViewer({
   );
 }
 
-// ── Unified PDF input form (URL tab + File Upload tab) ────────
+// ── Unified PDF input form (URL + File Upload tabs) ────────────
 type Tab = 'url' | 'file';
 
 function PdfInputForm({
@@ -78,7 +78,6 @@ function PdfInputForm({
   const [fileErr, setFileErr] = useState('');
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
-  const [uploadedName, setUploadedName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   const validateUrl = (v: string) => {
@@ -93,10 +92,7 @@ function PdfInputForm({
 
   const processFile = useCallback((file: File) => {
     setFileErr('');
-    if (file.type !== 'application/pdf') {
-      setFileErr('Тек PDF файл жүктеуге болады');
-      return;
-    }
+    if (file.type !== 'application/pdf') { setFileErr('Тек PDF файл жүктеуге болады'); return; }
     if (file.size > MAX_FILE_BYTES) {
       setFileErr(`Файл 10 МБ-тан аспауы керек (${(file.size / 1048576).toFixed(1)} МБ)`);
       return;
@@ -106,20 +102,12 @@ function PdfInputForm({
     reader.onload = () => {
       const base64 = reader.result as string;
       const name = file.name.replace(/\.pdf$/i, '');
-      setUploadedName(name);
       setUploading(false);
       onSave(base64, name);
     };
     reader.onerror = () => { setFileErr('Файлды оқу қатесі'); setUploading(false); };
     reader.readAsDataURL(file);
   }, [onSave]);
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) processFile(file);
-  };
 
   return (
     <motion.div
@@ -132,15 +120,12 @@ function PdfInputForm({
       {/* Tabs */}
       <div className="flex border-b border-white/10">
         {([['url', Link, 'Сілтеме'], ['file', Upload, 'Файл жүктеу']] as const).map(([id, Icon, label]) => (
-          <button
-            key={id}
-            onClick={() => setTab(id)}
+          <button key={id} onClick={() => setTab(id)}
             className={`flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium transition-colors ${
               tab === id
                 ? 'text-amber-300 border-b-2 border-amber-400 bg-amber-500/5'
                 : 'text-white/40 hover:text-white/60'
-            }`}
-          >
+            }`}>
             <Icon className="w-3.5 h-3.5" /> {label}
           </button>
         ))}
@@ -177,16 +162,13 @@ function PdfInputForm({
           </>
         ) : (
           <>
-            {/* Drop zone */}
             <div
               onDragOver={e => { e.preventDefault(); setDragging(true); }}
               onDragLeave={() => setDragging(false)}
-              onDrop={handleDrop}
+              onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files[0]; if (f) processFile(f); }}
               onClick={() => inputRef.current?.click()}
               className={`cursor-pointer rounded-xl border-2 border-dashed p-6 text-center transition-all ${
-                dragging
-                  ? 'border-amber-400 bg-amber-500/10'
-                  : 'border-white/15 hover:border-amber-400/40 hover:bg-white/3'
+                dragging ? 'border-amber-400 bg-amber-500/10' : 'border-white/15 hover:border-amber-400/40 hover:bg-white/3'
               }`}
             >
               {uploading ? (
@@ -203,13 +185,8 @@ function PdfInputForm({
                 </div>
               )}
             </div>
-            <input
-              ref={inputRef}
-              type="file"
-              accept="application/pdf"
-              className="hidden"
-              onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }}
-            />
+            <input ref={inputRef} type="file" accept="application/pdf" className="hidden"
+              onChange={e => { const f = e.target.files?.[0]; if (f) processFile(f); }} />
             {fileErr && (
               <p className="flex items-center gap-1 text-red-400 text-xs">
                 <AlertCircle className="w-3 h-3 shrink-0" /> {fileErr}
@@ -226,7 +203,7 @@ function PdfInputForm({
   );
 }
 
-// ── Main hook-powered action buttons ─────────────────────────
+// ── Main WorkActions component ─────────────────────────────────
 interface WorkActionsProps {
   workId: string;
   workTitle: string;
@@ -243,21 +220,15 @@ export function WorkActions({
   compact = false,
 }: WorkActionsProps) {
   const { entry, setPdf, removePdf } = useWorkPdf(writerSlug, workId);
-  const [showViewer, setShowViewer] = useState(false);
+  const [, navigate] = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [confirmDel, setConfirmDel] = useState(false);
 
   const hasPdfNow = !!entry;
   const isFile = hasPdfNow && entry!.url.startsWith('data:');
 
-  const handleReadClick = () => {
-    if (hasPdfNow) { setShowViewer(true); return; }
-    if (hasRead) setShowForm(true);
-  };
-
-  const handlePdfBtnClick = () => {
-    if (hasPdfNow) setShowViewer(true);
-    else setShowForm(s => !s);
+  const openReader = () => {
+    navigate(`/shygarma/${encodeURIComponent(writerSlug)}/${encodeURIComponent(workId)}`);
   };
 
   const handleDelPdf = () => {
@@ -272,33 +243,35 @@ export function WorkActions({
   return (
     <div className={`relative ${compact ? 'flex justify-end gap-2' : 'flex gap-2 mt-2 pt-2 border-t border-white/5'}`}>
 
-      {/* Оқу / Open PDF */}
+      {/* Оқу — open dedicated reader page */}
       {(hasRead || hasPdfNow) && (
         <button
-          onClick={handleReadClick}
+          onClick={hasPdfNow ? openReader : () => setShowForm(true)}
           className={`${cls} ${
             hasPdfNow
               ? 'bg-amber-500/20 hover:bg-amber-500/35 text-amber-300 border border-amber-500/25'
               : 'bg-primary/20 hover:bg-primary text-white'
           }`}
-          title={hasPdfNow ? `${workTitle} — PDF қарау` : 'Оқу'}
+          title={hasPdfNow ? `${workTitle} — бетін ашу` : 'Оқу'}
         >
-          {hasPdfNow ? <FileText className={compact ? 'w-4 h-4' : 'w-3 h-3'} /> : <BookOpen className={compact ? 'w-4 h-4' : 'w-3 h-3'} />}
-          {!compact && (hasPdfNow ? (isFile ? '📂 PDF оқу' : 'PDF оқу') : 'Оқу')}
+          {hasPdfNow
+            ? <FileText className={compact ? 'w-4 h-4' : 'w-3 h-3'} />
+            : <BookOpen className={compact ? 'w-4 h-4' : 'w-3 h-3'} />}
+          {!compact && (hasPdfNow ? (isFile ? '📂 Ашып оқу' : 'Ашып оқу') : 'Оқу')}
         </button>
       )}
 
-      {/* PDF manage */}
+      {/* PDF manage — edit link/file */}
       {(hasPdf || hasPdfNow) && (
         <div className="relative">
           <button
-            onClick={handlePdfBtnClick}
+            onClick={() => setShowForm(s => !s)}
             className={`${cls} ${
               hasPdfNow
                 ? 'bg-teal-500/15 hover:bg-teal-500/25 text-teal-400 border border-teal-500/20'
                 : 'bg-white/10 hover:bg-white/20 text-white/70'
             }`}
-            title={hasPdfNow ? 'PDF ашу немесе өзгерту' : 'PDF қосу'}
+            title={hasPdfNow ? 'PDF өзгерту' : 'PDF қосу'}
           >
             <FileText className={compact ? 'w-4 h-4' : 'w-3 h-3'} />
             {!compact && 'PDF'}
@@ -315,7 +288,7 @@ export function WorkActions({
         </div>
       )}
 
-      {/* PDF add button — when nothing set */}
+      {/* PDF add — when neither flag is set */}
       {!hasPdf && !hasRead && !hasPdfNow && (
         <div className="relative">
           <button
@@ -353,7 +326,7 @@ export function WorkActions({
         </button>
       )}
 
-      {/* Open externally — only for URL-based PDFs */}
+      {/* External link — URL-based only */}
       {hasPdfNow && !isFile && (
         <a href={entry!.url} target="_blank" rel="noopener noreferrer"
           className={`${cls} bg-white/5 hover:bg-white/10 text-white/25 hover:text-white ${compact ? 'border border-white/8' : ''}`}
@@ -361,13 +334,6 @@ export function WorkActions({
           <ExternalLink className={compact ? 'w-4 h-4' : 'w-3 h-3'} />
         </a>
       )}
-
-      {/* Viewer modal */}
-      <AnimatePresence>
-        {showViewer && entry && (
-          <WorkPdfViewer url={entry.url} title={entry.title} onClose={() => setShowViewer(false)} />
-        )}
-      </AnimatePresence>
     </div>
   );
 }
