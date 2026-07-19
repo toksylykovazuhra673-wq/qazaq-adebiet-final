@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import type { GeneratedLesson } from '@/utils/lessonPlanGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'wouter';
-import { AlertCircle } from 'lucide-react';
+import { Sparkles } from 'lucide-react';
 
 import { useAnalysis } from '@/hooks/useAnalysis';
 import AnalysisLoadingSkeleton from '@/components/analysis/LoadingSkeleton';
@@ -11,7 +11,7 @@ import AnalysisHero            from '@/components/analysis/AnalysisHero';
 import AnalysisQuickActions    from '@/components/analysis/AnalysisQuickActions';
 import AnalysisTabBar          from '@/components/analysis/AnalysisTabBar';
 
-// ── Tab components ───────────────────────────────────────────
+// ── Tab components ────────────────────────────────────────────
 import TabGeneral      from '@/components/analysis/tabs/TabGeneral';
 import TabSummary      from '@/components/analysis/tabs/TabSummary';
 import TabTheme        from '@/components/analysis/tabs/TabTheme';
@@ -33,44 +33,26 @@ import {
   TabDevices, TabTheory, TabHistorical, TabFacts,
 } from '@/components/analysis/tabs/TabWrap';
 
-// ── Not-found state ──────────────────────────────────────────
-function NotFoundState({ workSlug }: { workSlug: string }) {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 flex items-center justify-center p-6">
-      <div className="text-center max-w-md">
-        <div className="w-16 h-16 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-center mx-auto mb-4">
-          <AlertCircle size={28} className="text-white/30" />
-        </div>
-        <h2 className="text-white text-xl font-semibold mb-2">Талдау табылмады</h2>
-        <p className="text-white/50 text-sm leading-relaxed mb-4">
-          «{workSlug}» шығармасының талдауы әлі дайын емес. Жаңа талдау қосу үшін{' '}
-          <code className="text-violet-400 bg-violet-400/10 px-1 rounded">
-            src/data/analysis.json
-          </code>{' '}
-          файлына жаңа объект енгізіңіз.
-        </p>
-        <button
-          onClick={() => window.history.back()}
-          className="px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 text-white text-sm transition-colors"
-        >
-          Артқа оралу
-        </button>
-      </div>
-    </div>
-  );
-}
-
-// ── Tab content renderer ─────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// ── Tab content renderer ──────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 interface TabContentProps {
   tabId: string;
   analysis: ReturnType<typeof useAnalysis>['analysis'];
+  workSlug: string;
   customLesson: GeneratedLesson | null;
   onGenerate: (lesson: GeneratedLesson) => void;
   onGoToStudent: () => void;
 }
 
-function TabContent({ tabId, analysis, customLesson, onGenerate, onGoToStudent }: TabContentProps) {
+function TabContent({ tabId, analysis, workSlug, customLesson, onGenerate, onGoToStudent }: TabContentProps) {
+  // 'auto' tab always works — even without database analysis
+  if (tabId === 'auto') {
+    return <TabAutoAnalysis analysis={analysis} workSlug={workSlug} />;
+  }
+
   if (!analysis) return null;
+
   switch (tabId) {
     case 'general':     return <TabGeneral analysis={analysis} />;
     case 'summary':     return <TabSummary analysis={analysis} />;
@@ -95,34 +77,90 @@ function TabContent({ tabId, analysis, customLesson, onGenerate, onGoToStudent }
     case 'teacher':     return <TabTeacher analysis={analysis} customLesson={customLesson} onGenerate={onGenerate} onGoToStudent={onGoToStudent} />;
     case 'student':     return <TabStudent analysis={analysis} customLesson={customLesson} />;
     case 'media':       return <TabMedia analysis={analysis} />;
-    case 'auto':        return <TabAutoAnalysis />;
     default:            return <TabGeneral analysis={analysis} />;
   }
 }
 
-// ── Main Page ────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
+// ── "Not in database" state — shows auto tab ─────────────────
+// ─────────────────────────────────────────────────────────────
+function AutoOnlyShell({ workSlug, activeTab, onTabChange }: {
+  workSlug: string; activeTab: string; onTabChange: (id: string) => void;
+}) {
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0d0d1a] to-slate-950">
+      {/* Minimal top bar */}
+      <div className="sticky top-0 z-40 bg-black/60 backdrop-blur-xl border-b border-white/8 px-4 py-3 flex items-center gap-3">
+        <button onClick={() => window.history.back()} className="text-white/40 hover:text-white text-sm transition-colors">
+          ← Артқа
+        </button>
+        <div className="w-px h-4 bg-white/10" />
+        <div className="flex items-center gap-2">
+          <div className="w-5 h-5 rounded-md bg-violet-500/20 flex items-center justify-center">
+            <Sparkles size={11} className="text-violet-400" />
+          </div>
+          <span className="text-white/70 text-sm font-medium">Автоматты талдау</span>
+          <span className="text-white/25 text-xs">— {workSlug}</span>
+        </div>
+      </div>
+
+      {/* Tab bar */}
+      <AnalysisTabBar activeTab={activeTab} onTabChange={onTabChange} />
+
+      {/* Content */}
+      <div className="max-w-6xl mx-auto px-4 py-8 md:px-6">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+          >
+            <TabAutoAnalysis analysis={null} workSlug={workSlug} />
+          </motion.div>
+        </AnimatePresence>
+        <div className="h-24" />
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────
+// ── Main Page ─────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────
 export default function AnalysisPage() {
-  const params  = useParams<{ workSlug: string }>();
+  const params   = useParams<{ workSlug: string }>();
   const workSlug = params.workSlug ?? '';
   const { analysis, loading } = useAnalysis(workSlug);
-  const [activeTab, setActiveTab] = useState('general');
+
+  // Default to 'auto' when no database analysis found, else 'general'
+  const defaultTab = analysis ? 'general' : 'auto';
+  const [activeTab, setActiveTab] = useState(defaultTab);
   const [customLesson, setCustomLesson] = useState<GeneratedLesson | null>(null);
 
-  const handleGenerate = useCallback((lesson: GeneratedLesson) => {
-    setCustomLesson(lesson);
-  }, []);
+  // Sync default tab when analysis loads
+  useEffect(() => {
+    if (!loading) {
+      setActiveTab(analysis ? 'general' : 'auto');
+    }
+  }, [analysis, loading]);
 
-  const handleGoToStudent = useCallback(() => {
-    setActiveTab('student');
-  }, []);
+  const handleGenerate   = useCallback((lesson: GeneratedLesson) => setCustomLesson(lesson), []);
+  const handleGoToStudent = useCallback(() => setActiveTab('student'), []);
 
   useEffect(() => {
     if (analysis) document.title = `Талдау: ${analysis.title}`;
+    else if (workSlug) document.title = `Автоматты талдау: ${workSlug}`;
     return () => { document.title = 'QazaqAdebiet'; };
-  }, [analysis]);
+  }, [analysis, workSlug]);
 
-  if (loading)   return <AnalysisLoadingSkeleton />;
-  if (!analysis) return <NotFoundState workSlug={workSlug} />;
+  if (loading) return <AnalysisLoadingSkeleton />;
+
+  // No database entry — show auto-only shell
+  if (!analysis) {
+    return <AutoOnlyShell workSlug={workSlug} activeTab={activeTab} onTabChange={setActiveTab} />;
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0d0d1a] to-slate-950 print:bg-white">
@@ -133,19 +171,19 @@ export default function AnalysisPage() {
         <p className="text-gray-500 mt-1">{analysis.author} · {analysis.period}</p>
       </div>
 
-      {/* ── Apple Books style top bar ── */}
+      {/* Apple Books style top bar */}
       <AnalysisTopBar analysis={analysis} />
 
-      {/* ── Hero section ── */}
+      {/* Hero section */}
       <AnalysisHero analysis={analysis} />
 
-      {/* ── Quick actions ── */}
+      {/* Quick actions */}
       <AnalysisQuickActions analysis={analysis} onTabChange={setActiveTab} />
 
-      {/* ── Tab navigation ── */}
+      {/* Tab navigation */}
       <AnalysisTabBar activeTab={activeTab} onTabChange={setActiveTab} />
 
-      {/* ── Tab content ── */}
+      {/* Tab content */}
       <div className="max-w-6xl mx-auto px-4 py-8 md:px-6">
         <AnimatePresence mode="wait">
           <motion.div
@@ -158,6 +196,7 @@ export default function AnalysisPage() {
             <TabContent
               tabId={activeTab}
               analysis={analysis}
+              workSlug={workSlug}
               customLesson={customLesson}
               onGenerate={handleGenerate}
               onGoToStudent={handleGoToStudent}

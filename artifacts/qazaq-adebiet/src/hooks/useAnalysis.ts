@@ -1,13 +1,13 @@
 import { useMemo } from 'react';
 import type { Analysis } from '@/types/analysis';
-import analysisData from '@/data/analysis.json';
+import workAnalysesData from '@/data/workAnalyses.json';
 
-const allAnalyses: Analysis[] = analysisData as unknown as Analysis[];
+const allAnalyses: Analysis[] = workAnalysesData as unknown as Analysis[];
 
 export function useAnalysis(workSlug: string) {
   const analysis = useMemo(
     () => allAnalyses.find((a) => a.workSlug === workSlug) ?? null,
-    [workSlug]
+    [workSlug],
   );
   return { analysis, loading: false };
 }
