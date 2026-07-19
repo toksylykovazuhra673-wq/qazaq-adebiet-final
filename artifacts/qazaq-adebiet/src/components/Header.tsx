@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
-import { Search, Menu, X } from 'lucide-react';
+import { Search, Menu, X, GraduationCap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const NAV_LINKS = [
@@ -65,6 +65,15 @@ export default function Header() {
 
             {/* Actions */}
             <div className="flex items-center gap-4 z-50">
+              {/* Cabinet button */}
+              <Link href="/cabinet"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                  bg-violet-500/15 border border-violet-500/30 text-violet-300
+                  hover:bg-violet-500/25 transition-all text-sm font-medium">
+                <GraduationCap size={14} />
+                Кабинет
+              </Link>
+
               <div className="relative flex items-center">
                 <AnimatePresence>
                   {isSearchOpen && (

@@ -28,6 +28,7 @@ import AnalysisPage       from '@/pages/analysis/AnalysisPage';
 import FreeAnalysisPage   from '@/pages/analysis/FreeAnalysisPage';
 import InteractivePage    from '@/pages/interactive/InteractivePage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
+import StudentCabinetPage from '@/pages/cabinet/StudentCabinetPage';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -164,6 +165,11 @@ function Router() {
       {/* Interactive Learning Lab — /interactive */}
       <Route path="/interactive">
         {() => <InteractivePage />}
+      </Route>
+
+      {/* Student Cabinet — /cabinet */}
+      <Route path="/cabinet">
+        {() => <StudentCabinetPage />}
       </Route>
 
       <Route>
