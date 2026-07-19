@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
+import type { GeneratedLesson } from '@/utils/lessonPlanGenerator';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams } from 'wouter';
 import { AlertCircle } from 'lucide-react';
@@ -60,7 +61,15 @@ function NotFoundState({ workSlug }: { workSlug: string }) {
 }
 
 // ── Tab content renderer ─────────────────────────────────────
-function TabContent({ tabId, analysis }: { tabId: string; analysis: ReturnType<typeof useAnalysis>['analysis'] }) {
+interface TabContentProps {
+  tabId: string;
+  analysis: ReturnType<typeof useAnalysis>['analysis'];
+  customLesson: GeneratedLesson | null;
+  onGenerate: (lesson: GeneratedLesson) => void;
+  onGoToStudent: () => void;
+}
+
+function TabContent({ tabId, analysis, customLesson, onGenerate, onGoToStudent }: TabContentProps) {
   if (!analysis) return null;
   switch (tabId) {
     case 'general':     return <TabGeneral analysis={analysis} />;
@@ -83,8 +92,8 @@ function TabContent({ tabId, analysis }: { tabId: string; analysis: ReturnType<t
     case 'interactive': return <TabInteractive analysis={analysis} />;
     case 'olympiad':    return <TabOlympiad analysis={analysis} />;
     case 'synopsis':    return <TabSynopsis analysis={analysis} />;
-    case 'teacher':     return <TabTeacher analysis={analysis} />;
-    case 'student':     return <TabStudent analysis={analysis} />;
+    case 'teacher':     return <TabTeacher analysis={analysis} customLesson={customLesson} onGenerate={onGenerate} onGoToStudent={onGoToStudent} />;
+    case 'student':     return <TabStudent analysis={analysis} customLesson={customLesson} />;
     case 'media':       return <TabMedia analysis={analysis} />;
     case 'auto':        return <TabAutoAnalysis />;
     default:            return <TabGeneral analysis={analysis} />;
@@ -97,6 +106,15 @@ export default function AnalysisPage() {
   const workSlug = params.workSlug ?? '';
   const { analysis, loading } = useAnalysis(workSlug);
   const [activeTab, setActiveTab] = useState('general');
+  const [customLesson, setCustomLesson] = useState<GeneratedLesson | null>(null);
+
+  const handleGenerate = useCallback((lesson: GeneratedLesson) => {
+    setCustomLesson(lesson);
+  }, []);
+
+  const handleGoToStudent = useCallback(() => {
+    setActiveTab('student');
+  }, []);
 
   useEffect(() => {
     if (analysis) document.title = `Талдау: ${analysis.title}`;
@@ -137,7 +155,13 @@ export default function AnalysisPage() {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2 }}
           >
-            <TabContent tabId={activeTab} analysis={analysis} />
+            <TabContent
+              tabId={activeTab}
+              analysis={analysis}
+              customLesson={customLesson}
+              onGenerate={handleGenerate}
+              onGoToStudent={handleGoToStudent}
+            />
           </motion.div>
         </AnimatePresence>
         <div className="h-24" />
