@@ -136,16 +136,18 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-xl flex flex-col pt-24 px-6 pb-6 lg:hidden"
+            className="fixed inset-0 z-40 bg-[#0d0820] backdrop-blur-xl flex flex-col pt-24 px-6 pb-6 lg:hidden"
           >
-            <nav className="flex flex-col gap-6">
+            <nav className="flex flex-col gap-1">
               {NAV_LINKS.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`text-xl font-medium transition-colors ${
-                    location === link.href ? 'text-accent' : 'text-white/80'
+                  className={`text-xl font-semibold py-3 px-4 rounded-xl transition-all ${
+                    location === link.href
+                      ? 'text-violet-300 bg-violet-500/15'
+                      : 'text-white hover:text-violet-200 hover:bg-white/6'
                   }`}
                 >
                   {link.label}
@@ -154,22 +156,24 @@ export default function Header() {
             </nav>
             <div className="mt-6 flex flex-col gap-3">
               <Link href="/cabinet" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-violet-500/10
-                  border border-violet-500/20 text-violet-400 font-medium">
-                <GraduationCap size={16} /> Оқушы кабинеті
+                className="flex items-center gap-2 px-5 py-3.5 rounded-2xl
+                  bg-violet-600/30 border border-violet-500/50
+                  text-violet-100 font-semibold text-base
+                  hover:bg-violet-600/45 transition-all shadow-lg shadow-violet-900/30">
+                <GraduationCap size={18} /> Оқушы кабинеті
               </Link>
               <Link href="/mugalim" onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-500/10
-                  border border-emerald-500/20 text-emerald-400 font-medium">
-                <GraduationCap size={16} /> Мұғалім кабинеті
+                className="flex items-center gap-2 px-5 py-3.5 rounded-2xl
+                  bg-emerald-600/30 border border-emerald-500/50
+                  text-emerald-100 font-semibold text-base
+                  hover:bg-emerald-600/45 transition-all shadow-lg shadow-emerald-900/30">
+                <GraduationCap size={18} /> Мұғалім кабинеті
               </Link>
             </div>
             <div className="mt-auto">
-              <div className="glass-panel p-4 rounded-xl">
-                <p className="text-sm text-muted-foreground text-center">
-                  «Қазақ әдебиеті» · Цифрлық білім беру платформасы © 2025
-                </p>
-              </div>
+              <p className="text-sm text-white/35 text-center py-4">
+                «Қазақ әдебиеті» · Цифрлық білім беру платформасы © 2025
+              </p>
             </div>
           </motion.div>
         )}
