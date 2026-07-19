@@ -4,7 +4,7 @@ import {
   BookOpen, AlignLeft, Lightbulb, Layers, GitBranch, Users,
   User, Type, Palette, Music2, Microscope, Clock, Brain,
   GraduationCap, Globe, Star, CheckSquare, Puzzle, Trophy,
-  FileText, Presentation, BookMarked, Film,
+  FileText, Presentation, BookMarked, Film, Sparkles,
 } from 'lucide-react';
 
 export interface TabDef {
@@ -38,6 +38,7 @@ export const TABS: TabDef[] = [
   { id: 'teacher',     label: 'Мұғалімге',              icon: <Presentation size={14} />,  group: 'practice' },
   { id: 'student',     label: 'Оқушыға',                icon: <BookMarked size={14} />,    group: 'practice' },
   { id: 'media',       label: 'PDF · Аудио · Бейне',   icon: <Film size={14} />,          group: 'media' },
+  { id: 'auto',        label: 'Автоматты талдау',      icon: <Sparkles size={14} />,      group: 'tools' },
 ];
 
 interface Props {

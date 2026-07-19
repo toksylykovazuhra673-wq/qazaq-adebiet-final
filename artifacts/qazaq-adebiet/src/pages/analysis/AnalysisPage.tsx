@@ -26,6 +26,7 @@ import TabSynopsis     from '@/components/analysis/tabs/TabSynopsis';
 import TabTeacher      from '@/components/analysis/tabs/TabTeacher';
 import TabStudent      from '@/components/analysis/tabs/TabStudent';
 import TabMedia        from '@/components/analysis/tabs/TabMedia';
+import TabAutoAnalysis  from '@/components/analysis/tabs/TabAutoAnalysis';
 import {
   TabComposition, TabPlot, TabCharacters, TabLanguage,
   TabDevices, TabTheory, TabHistorical, TabFacts,
@@ -85,6 +86,7 @@ function TabContent({ tabId, analysis }: { tabId: string; analysis: ReturnType<t
     case 'teacher':     return <TabTeacher analysis={analysis} />;
     case 'student':     return <TabStudent analysis={analysis} />;
     case 'media':       return <TabMedia analysis={analysis} />;
+    case 'auto':        return <TabAutoAnalysis />;
     default:            return <TabGeneral analysis={analysis} />;
   }
 }

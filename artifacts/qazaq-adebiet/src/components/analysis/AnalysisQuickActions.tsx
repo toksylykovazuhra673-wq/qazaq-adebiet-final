@@ -16,7 +16,7 @@ const ACTIONS = [
   { id: 'listen',    icon: Headphones,     label: 'Тыңдау',         color: 'from-amber-500 to-orange-500',    tab: 'media' },
   { id: 'pdf',       icon: FileText,       label: 'PDF',            color: 'from-blue-500 to-indigo-500',     tab: 'media' },
   { id: 'video',     icon: Play,           label: 'Бейне',          color: 'from-red-500 to-pink-500',        tab: 'media' },
-  { id: 'analysis',  icon: Sparkles,       label: 'Автоматты талдау', color: 'from-violet-500 to-purple-500', tab: 'general' },
+  { id: 'analysis',  icon: Sparkles,       label: 'Автоматты талдау', color: 'from-violet-500 to-purple-500', tab: 'auto' },
   { id: 'synopsis',  icon: ClipboardList,  label: 'Конспект',       color: 'from-cyan-500 to-blue-500',       tab: 'synopsis' },
   { id: 'lesson',    icon: Presentation,   label: 'Сабақ жоспары',  color: 'from-lime-500 to-green-500',      tab: 'teacher' },
   { id: 'olympiad',  icon: Trophy,         label: 'Олимпиада',      color: 'from-yellow-500 to-amber-500',    tab: 'olympiad' },
