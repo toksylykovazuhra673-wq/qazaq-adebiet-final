@@ -1,6 +1,7 @@
 import React from 'react';
 import { Play, Video, Youtube } from 'lucide-react';
 import type { BiSheshen } from '@/types/bi';
+import TeacherLinkSection from '@/components/bi/detail/TeacherLinkSection';
 
 export default function BiVideosTab({ bi }: { bi: BiSheshen }) {
   const ytSearch = `https://www.youtube.com/results?search_query=${encodeURIComponent(bi.fullName + ' би шешен')}`;
@@ -37,20 +38,23 @@ export default function BiVideosTab({ bi }: { bi: BiSheshen }) {
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-      {bi.videos.map(v => (
-        <div key={v.id} className="glass-card rounded-xl overflow-hidden group">
-          <a href={v.url} target="_blank" rel="noopener noreferrer">
-            <div className="relative aspect-video bg-white/5 flex items-center justify-center cursor-pointer">
-              {v.thumbnail ? <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-teal-500/20 to-amber-500/10" />}
-              <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors">
-                <div className="w-14 h-14 rounded-full bg-red-600/80 flex items-center justify-center shadow-lg"><Play className="w-6 h-6 text-white ml-1" /></div>
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {bi.videos.map(v => (
+          <div key={v.id} className="glass-card rounded-xl overflow-hidden group">
+            <a href={v.url} target="_blank" rel="noopener noreferrer">
+              <div className="relative aspect-video bg-white/5 flex items-center justify-center cursor-pointer">
+                {v.thumbnail ? <img src={v.thumbnail} alt={v.title} className="w-full h-full object-cover" /> : <div className="w-full h-full bg-gradient-to-br from-teal-500/20 to-amber-500/10" />}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/10 transition-colors">
+                  <div className="w-14 h-14 rounded-full bg-red-600/80 flex items-center justify-center shadow-lg"><Play className="w-6 h-6 text-white ml-1" /></div>
+                </div>
               </div>
-            </div>
-            <div className="p-4"><h3 className="text-white font-semibold mb-1">{v.title}</h3><p className="text-white/50 text-sm">{v.duration}</p></div>
-          </a>
-        </div>
-      ))}
+              <div className="p-4"><h3 className="text-white font-semibold mb-1">{v.title}</h3><p className="text-white/50 text-sm">{v.duration}</p></div>
+            </a>
+          </div>
+        ))}
+      </div>
+      <TeacherLinkSection biSlug={bi.slug} category="video" />
     </div>
   );
 }

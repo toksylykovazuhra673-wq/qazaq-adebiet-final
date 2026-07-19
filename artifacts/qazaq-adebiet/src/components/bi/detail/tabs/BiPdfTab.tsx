@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FileText, Download, Printer, ZoomIn, ZoomOut, X, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { BiSheshen } from '@/types/bi';
+import TeacherLinkSection from '@/components/bi/detail/TeacherLinkSection';
 
 function PdfViewer({ url, title, onClose }: { url: string; title: string; onClose: () => void }) {
   const [zoom, setZoom] = useState(100);
@@ -72,6 +73,7 @@ export default function BiPdfTab({ bi }: { bi: BiSheshen }) {
       <AnimatePresence>
         {openPdf && <PdfViewer url={openPdf.url} title={openPdf.title} onClose={() => setOpenPdf(null)} />}
       </AnimatePresence>
+      <TeacherLinkSection biSlug={bi.slug} category="pdf" />
     </>
   );
 }

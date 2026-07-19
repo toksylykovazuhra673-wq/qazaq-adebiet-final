@@ -1,6 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { Play, Pause, Headphones, Music2 } from 'lucide-react';
 import type { BiSheshen } from '@/types/bi';
+import TeacherLinkSection from '@/components/bi/detail/TeacherLinkSection';
 
 function AudioPlayer({ title, url, duration }: { title: string; url: string; duration: string }) {
   const [playing, setPlaying] = useState(false);
@@ -54,23 +55,14 @@ export default function BiAudioTab({ bi }: { bi: BiSheshen }) {
             <p className="text-white/50 text-sm max-w-sm">{bi.fullName} шешендік сөздерінің аудио жазбалары жақын арада қосылады.</p>
           </div>
         </div>
-        <div className="flex flex-col gap-4">
-          {[`${bi.fullName} — Шешендік сөз #1`, `${bi.fullName} — Нақыл сөздері`, `${bi.fullName} — Дау шешімі`].map((t, i) => (
-            <div key={i} className="glass-card p-5 rounded-xl flex flex-col gap-4 opacity-35 pointer-events-none">
-              <div className="flex items-center gap-4">
-                <div className="w-11 h-11 rounded-full bg-white/10 flex items-center justify-center shrink-0"><Play className="w-5 h-5 text-white/30 ml-0.5" /></div>
-                <div className="flex-1"><p className="text-white/60 font-medium text-sm">{t}</p><p className="text-white/30 text-xs mt-0.5">Жақын арада қосылады</p></div>
-              </div>
-              <div className="h-1.5 bg-white/10 rounded-full" />
-            </div>
-          ))}
-        </div>
+        <TeacherLinkSection biSlug={bi.slug} category="audio" />
       </div>
     );
   }
   return (
     <div className="flex flex-col gap-4">
       {bi.audio.map(a => <AudioPlayer key={a.id} title={a.title} url={a.url} duration={a.duration} />)}
+      <TeacherLinkSection biSlug={bi.slug} category="audio" />
     </div>
   );
 }
