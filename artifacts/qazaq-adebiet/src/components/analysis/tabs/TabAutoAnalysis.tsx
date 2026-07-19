@@ -894,6 +894,502 @@ function Tag({ children, color = 'violet' }: { children: React.ReactNode; color?
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// ── Poetry Structure Analysis — 8 elements with diagrams ─────────────────────
+// ─────────────────────────────────────────────────────────────────────────────
+
+/** Standard Kazakh cesura/foot (бунақ) splits by syllable count */
+function detectFeet(sylCount: number): number[] {
+  const patterns: Record<number, number[]> = {
+    3: [3], 4: [2, 2], 5: [3, 2], 6: [3, 3],
+    7: [4, 3], 8: [4, 4], 9: [4, 5], 10: [3, 4, 3],
+    11: [4, 4, 3], 12: [4, 4, 4], 13: [4, 4, 5],
+    14: [4, 4, 3, 3], 15: [4, 4, 4, 3], 16: [4, 4, 4, 4],
+  };
+  if (patterns[sylCount]) return patterns[sylCount];
+  if (sylCount >= 17) return [4, 4, 4, Math.max(1, sylCount - 12)];
+  return [Math.ceil(sylCount / 2), Math.floor(sylCount / 2)];
+}
+
+/** Meter name from average syllable count */
+function meterName(avg: number): { name: string; kazakh: string; desc: string } {
+  if (avg <= 4) return { name: 'Кіші өлшем', kazakh: 'Кіші форма', desc: 'Балалар поэзиясы мен шағын жырларда кездеседі.' };
+  if (avg <= 6) return { name: '5–6 буынды', kazakh: 'Бесалты буынды', desc: 'Халық нақылдары, жұмбақтар, шағын жырлар.' };
+  if (avg === 7) return { name: '7 буынды', kazakh: 'Жеті буынды', desc: 'Қазақ халық лирикасының классикалық өлшемі.' };
+  if (avg === 8) return { name: '8 буынды', kazakh: 'Сегіз буынды', desc: '4+4 бунақты жазба поэзиясында жиі кездеседі.' };
+  if (avg >= 9 && avg <= 10) return { name: '9–10 буынды', kazakh: 'Тоғыз-он буынды', desc: 'Жазба поэзияда, романтикалық лирикада.' };
+  if (avg === 11) return { name: '11 буынды', kazakh: 'Он бір буынды (жыр)', desc: '4+4+3 — классикалық жыр өлшемі, Абай дәстүрі.' };
+  if (avg >= 12 && avg <= 13) return { name: '12–13 буынды', kazakh: 'Он екі-он үш буынды', desc: 'Батырлар жыры, дастан өлшемдері.' };
+  if (avg >= 14) return { name: '14 буынды', kazakh: 'Он төрт буынды', desc: '4+4+3+3 — эпикалық жыр дәстүрі, ертедегі жырлар.' };
+  return { name: `${avg} буынды`, kazakh: `${avg} буынды өлшем`, desc: 'Аралас немесе еркін өлшем.' };
+}
+
+/** Simple rhythm label from foot pattern */
+function rhythmLabel(feet: number[]): string {
+  const all = feet.every(f => f === feet[0]);
+  if (all && feet[0] === 4) return 'Тетраметрлік ырғақ (4×n)';
+  if (all && feet[0] === 3) return 'Триметрлік ырғақ (3×n)';
+  if (feet.length === 2 && feet[0] === 4 && feet[1] === 3) return 'Жеті буынды ырғақ (4+3)';
+  if (feet.length === 3 && feet[0] === 4 && feet[1] === 4) return 'Он бір буынды ырғақ (4+4+3)';
+  if (feet.length === 4) return 'Он төрт буынды ырғақ (4+4+3+3)';
+  if (feet.length === 2) return `Қос бунақты ырғақ (${feet.join('+')} )`;
+  return 'Аралас ырғақ';
+}
+
+/** Determine if text is poetry (regular syllable count, rhyme, stanza structure) */
+function isPoetry(lines: string[], sylPerLine: number[]): boolean {
+  if (lines.length < 4) return false;
+  const avg = sylPerLine.reduce((a, b) => a + b, 0) / (sylPerLine.length || 1);
+  const variance = sylPerLine.reduce((s, v) => s + Math.abs(v - avg), 0) / (sylPerLine.length || 1);
+  return variance <= 3.5 || avg >= 6;
+}
+
+// Rhyme color palette (extended)
+const RHYME_PALETTE: Record<string, { bg: string; text: string; border: string; dot: string }> = {
+  А: { bg: 'bg-violet-500/25', text: 'text-violet-200', border: 'border-violet-500/40', dot: 'bg-violet-400' },
+  Б: { bg: 'bg-amber-500/25',  text: 'text-amber-200',  border: 'border-amber-500/40',  dot: 'bg-amber-400'  },
+  В: { bg: 'bg-emerald-500/25',text: 'text-emerald-200',border: 'border-emerald-500/40',dot: 'bg-emerald-400'},
+  Г: { bg: 'bg-rose-500/25',   text: 'text-rose-200',   border: 'border-rose-500/40',   dot: 'bg-rose-400'   },
+  Д: { bg: 'bg-sky-500/25',    text: 'text-sky-200',    border: 'border-sky-500/40',    dot: 'bg-sky-400'    },
+  Е: { bg: 'bg-pink-500/25',   text: 'text-pink-200',   border: 'border-pink-500/40',   dot: 'bg-pink-400'   },
+  Ж: { bg: 'bg-teal-500/25',   text: 'text-teal-200',   border: 'border-teal-500/40',   dot: 'bg-teal-400'   },
+  '—':{ bg: 'bg-white/5',      text: 'text-white/20',   border: 'border-white/10',      dot: 'bg-white/15'   },
+};
+function rpal(l: string) { return RHYME_PALETTE[l] ?? RHYME_PALETTE['—']; }
+
+interface PoemStructureData {
+  lines: string[];
+  stanzas: string[][];
+  sylPerLine: number[];
+  avgSyl: number;
+  rhymeLetters: string[];
+  rhymeLabel: string;
+  rhymeEndings: string[];
+  meter: ReturnType<typeof meterName>;
+  dominantFeet: number[];
+  rhythmStr: string;
+  isPoem: boolean;
+}
+
+function analyzePoemStructure(text: string): PoemStructureData {
+  const rawLines = text.split('\n');
+  const lines = rawLines.filter(l => l.trim().length > 0);
+
+  // Stanzas (blank-line separated groups)
+  const stanzas: string[][] = [];
+  let cur: string[] = [];
+  rawLines.forEach(l => {
+    if (l.trim()) { cur.push(l.trim()); }
+    else if (cur.length) { stanzas.push(cur); cur = []; }
+  });
+  if (cur.length) stanzas.push(cur);
+
+  const sylPerLine = lines.map(l =>
+    l.trim().split(/\s+/).reduce((s, w) => s + syllables(w), 0)
+  );
+  const avgSyl = sylPerLine.length
+    ? Math.round(sylPerLine.reduce((a, b) => a + b, 0) / sylPerLine.length)
+    : 0;
+
+  // Rhyme
+  const rhyme = detectRhyme(lines);
+  const rhymeEndings = lines.map(l => {
+    const w = l.trim().split(/\s+/);
+    const last = (w[w.length - 1] ?? '').replace(/[«».,!?;:—–\-]/g, '');
+    return last.slice(-3).toLowerCase();
+  });
+
+  const meter = meterName(avgSyl);
+  const dominantFeet = detectFeet(avgSyl);
+  const rhythmStr = rhythmLabel(dominantFeet);
+  const isPoem = isPoetry(lines, sylPerLine);
+
+  return { lines, stanzas, sylPerLine, avgSyl, rhymeLetters: rhyme.letters, rhymeLabel: rhyme.label, rhymeEndings, meter, dominantFeet, rhythmStr, isPoem };
+}
+
+// ── Mini stat card ─────────────────────────────────────────────
+function PoemStatCard({ value, sub, label, color = 'violet' }: { value: React.ReactNode; sub?: string; label: string; color?: string }) {
+  const cls: Record<string, string> = {
+    violet: 'text-violet-300', amber: 'text-amber-300', emerald: 'text-emerald-300',
+    blue: 'text-blue-300', rose: 'text-rose-300', teal: 'text-teal-300', fuchsia: 'text-fuchsia-300',
+  };
+  return (
+    <div className="bg-white/[0.04] border border-white/8 rounded-xl p-4 text-center">
+      <p className={`text-2xl font-bold ${cls[color] ?? cls.violet}`}>{value}</p>
+      {sub && <p className={`text-[11px] mt-0.5 ${cls[color] ?? cls.violet} opacity-60`}>{sub}</p>}
+      <p className="text-white/40 text-xs mt-1">{label}</p>
+    </div>
+  );
+}
+
+// ── Syllable bar chart ─────────────────────────────────────────
+function SyllableChart({ sylPerLine, avgSyl, lines }: { sylPerLine: number[]; avgSyl: number; lines: string[] }) {
+  const max = Math.max(...sylPerLine, 1);
+  const colorForDiff = (syl: number) => {
+    const d = Math.abs(syl - avgSyl);
+    if (d === 0) return 'from-emerald-500/80 to-teal-400/70';
+    if (d <= 1) return 'from-violet-500/70 to-purple-400/60';
+    if (d <= 2) return 'from-amber-500/70 to-yellow-400/60';
+    return 'from-rose-500/70 to-red-400/60';
+  };
+  return (
+    <div className="space-y-1.5">
+      {sylPerLine.slice(0, 24).map((syl, i) => (
+        <div key={i} className="flex items-center gap-2 group">
+          <span className="text-white/20 text-[10px] font-mono w-5 text-right shrink-0">{i + 1}</span>
+          <div className="flex-1 relative h-5 bg-white/[0.03] rounded-full overflow-hidden">
+            <motion.div
+              initial={{ width: 0 }}
+              animate={{ width: `${(syl / max) * 100}%` }}
+              transition={{ duration: 0.5, delay: i * 0.025, ease: 'easeOut' }}
+              className={`h-full bg-gradient-to-r ${colorForDiff(syl)} rounded-full`}
+            />
+            {/* avg line */}
+            <div
+              className="absolute top-0 bottom-0 w-px bg-white/20"
+              style={{ left: `${(avgSyl / max) * 100}%` }}
+            />
+          </div>
+          <span className={`text-[11px] font-mono w-5 shrink-0 ${
+            Math.abs(syl - avgSyl) === 0 ? 'text-emerald-400' :
+            Math.abs(syl - avgSyl) <= 1 ? 'text-violet-400' :
+            Math.abs(syl - avgSyl) <= 2 ? 'text-amber-400' : 'text-rose-400'
+          }`}>{syl}</span>
+          <span className="text-white/15 text-[10px] truncate max-w-[120px] hidden sm:block">
+            {lines[i]?.trim().slice(0, 20)}
+          </span>
+        </div>
+      ))}
+      <div className="flex items-center gap-3 mt-2 flex-wrap text-[11px]">
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-400" /> Орта ({avgSyl} буын)</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-violet-400" /> ±1 буын</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-400" /> ±2 буын</span>
+        <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-rose-400" /> ±3+ буын</span>
+      </div>
+    </div>
+  );
+}
+
+// ── Stanza grid ────────────────────────────────────────────────
+function StanzaGrid({ stanzas, rhymeLetters }: { stanzas: string[][]; rhymeLetters: string[] }) {
+  let lineIdx = 0;
+  return (
+    <div className="space-y-3">
+      {stanzas.map((stanza, si) => (
+        <div key={si} className="bg-white/[0.02] border border-white/6 rounded-xl p-3">
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-white/25 text-[11px] uppercase tracking-wider">
+              {si + 1}-шумақ · {stanza.length} тармақ
+            </span>
+          </div>
+          <div className="space-y-1">
+            {stanza.map((line, li) => {
+              const letter = rhymeLetters[lineIdx] ?? '—';
+              const pal = rpal(letter);
+              lineIdx++;
+              return (
+                <div key={li} className="flex items-center gap-2">
+                  <span className={`w-5 h-5 rounded text-[10px] font-bold flex items-center justify-center border shrink-0 ${pal.bg} ${pal.text} ${pal.border}`}>
+                    {letter}
+                  </span>
+                  <span className="text-white/55 text-xs font-mono truncate flex-1">{line}</span>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── Rhyme scheme visual ────────────────────────────────────────
+function RhymeSchemeVisual({ letters, endings, rhymeLabel }: { letters: string[]; endings: string[]; rhymeLabel: string }) {
+  // Group unique rhymes
+  const uniqueLetters = [...new Set(letters.filter(l => l !== '—'))];
+  return (
+    <div className="space-y-4">
+      {/* Scheme strip */}
+      <div>
+        <p className="text-white/30 text-[11px] uppercase tracking-wider mb-2">Ұйқас сызбасы</p>
+        <div className="flex flex-wrap gap-1.5">
+          {letters.map((letter, i) => {
+            const pal = rpal(letter);
+            return (
+              <div key={i} className="flex flex-col items-center gap-0.5">
+                <span className={`w-8 h-8 rounded-lg border text-xs font-bold flex items-center justify-center ${pal.bg} ${pal.text} ${pal.border}`}>
+                  {letter}
+                </span>
+                <span className="text-white/20 text-[10px]">{i + 1}</span>
+              </div>
+            );
+          })}
+        </div>
+        <p className="text-white/50 text-xs mt-2 font-medium">{rhymeLabel}</p>
+      </div>
+
+      {/* Rhyme legend */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+        {uniqueLetters.slice(0, 6).map(letter => {
+          const pal = rpal(letter);
+          const idxs = letters.reduce<number[]>((a, l, i) => l === letter ? [...a, i] : a, []);
+          const endSamples = [...new Set(idxs.map(i => endings[i]).filter(Boolean))].slice(0, 3);
+          return (
+            <div key={letter} className={`rounded-xl border px-3 py-2.5 ${pal.bg} ${pal.border}`}>
+              <div className="flex items-center gap-2 mb-1">
+                <span className={`w-5 h-5 rounded text-[11px] font-bold flex items-center justify-center border ${pal.bg} ${pal.text} ${pal.border}`}>{letter}</span>
+                <span className={`text-xs font-semibold ${pal.text}`}>{idxs.length} жол</span>
+              </div>
+              <div className="flex flex-wrap gap-1">
+                {endSamples.map(e => (
+                  <span key={e} className={`text-[11px] font-mono px-1.5 py-0.5 rounded bg-black/20 ${pal.text}`}>…{e}</span>
+                ))}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Foot (Бунақ) visualizer ────────────────────────────────────
+function FootVisualizer({ sylPerLine, dominantFeet, lines }: { sylPerLine: number[]; dominantFeet: number[]; lines: string[] }) {
+  const FOOT_COLORS = ['bg-violet-500/30 border-violet-500/40', 'bg-amber-500/30 border-amber-500/40', 'bg-emerald-500/30 border-emerald-500/40', 'bg-sky-500/30 border-sky-500/40'];
+
+  return (
+    <div className="space-y-3">
+      {/* Dominant foot pattern */}
+      <div>
+        <p className="text-white/30 text-[11px] uppercase tracking-wider mb-2">Негізгі бунақ үлгісі</p>
+        <div className="flex items-center gap-2 flex-wrap">
+          {dominantFeet.map((f, i) => (
+            <React.Fragment key={i}>
+              <div className={`h-8 flex items-center justify-center rounded-lg border px-3 text-xs font-bold text-white/80 ${FOOT_COLORS[i % FOOT_COLORS.length]}`}>
+                {f} буын
+              </div>
+              {i < dominantFeet.length - 1 && <span className="text-white/20 text-sm">+</span>}
+            </React.Fragment>
+          ))}
+          <span className="text-white/30 text-xs ml-1">= {dominantFeet.reduce((a, b) => a + b, 0)} буын</span>
+        </div>
+      </div>
+
+      {/* Per-line foot breakdown (first 8 lines) */}
+      <div className="space-y-1.5">
+        <p className="text-white/30 text-[11px] uppercase tracking-wider">Жол бойынша бунақтар</p>
+        {sylPerLine.slice(0, 10).map((syl, i) => {
+          const feet = detectFeet(syl);
+          return (
+            <div key={i} className="flex items-center gap-2">
+              <span className="text-white/20 text-[10px] font-mono w-5 text-right shrink-0">{i + 1}</span>
+              <div className="flex items-center gap-1 flex-1">
+                {feet.map((f, fi) => (
+                  <React.Fragment key={fi}>
+                    <div className={`h-6 flex items-center justify-center rounded border px-2 text-[10px] font-mono text-white/70 ${FOOT_COLORS[fi % FOOT_COLORS.length]}`}
+                      style={{ minWidth: `${f * 14}px` }}>
+                      {f}
+                    </div>
+                    {fi < feet.length - 1 && (
+                      <div className="w-px h-4 bg-white/10 shrink-0" />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
+              <span className="text-white/20 text-[10px] truncate max-w-[100px] hidden md:block">
+                {lines[i]?.split(/\s+/).slice(0, 3).join(' ')}…
+              </span>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+// ── Rhythm strip ───────────────────────────────────────────────
+function RhythmStrip({ dominantFeet, rhythmStr, avgSyl }: { dominantFeet: number[]; rhythmStr: string; avgSyl: number }) {
+  // Generate a rhythm pattern based on feet: each foot gets alternating stress
+  const pattern: ('STRONG' | 'WEAK')[] = [];
+  dominantFeet.forEach((f, fi) => {
+    for (let s = 0; s < f; s++) {
+      // First syllable of each foot is "strong", rest are "weak"
+      pattern.push(s === 0 ? 'STRONG' : 'WEAK');
+    }
+  });
+
+  const meterType = avgSyl <= 6 ? 'Хорей' : avgSyl <= 8 ? 'Ямб/Хорей' : avgSyl <= 11 ? 'Дактиль' : 'Амфібрахий';
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <p className="text-white/30 text-[11px] uppercase tracking-wider mb-2">Бір жолдың ырғақ үлгісі</p>
+        <div className="flex items-end gap-1 flex-wrap">
+          {pattern.map((beat, i) => (
+            <div key={i} className="flex flex-col items-center gap-1">
+              <div className={`rounded-sm transition-all ${
+                beat === 'STRONG'
+                  ? 'w-5 h-6 bg-gradient-to-b from-violet-400 to-violet-600 shadow-lg shadow-violet-500/30'
+                  : 'w-5 h-3.5 bg-white/15'
+              }`} />
+              <span className="text-white/20 text-[9px]">{i + 1}</span>
+            </div>
+          ))}
+        </div>
+        <div className="flex items-center gap-3 mt-2 text-[11px] text-white/40">
+          <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-sm bg-violet-400 inline-block" /> Екпінді буын</span>
+          <span className="flex items-center gap-1"><span className="w-3 h-2 rounded-sm bg-white/15 inline-block" /> Екпінсіз буын</span>
+        </div>
+      </div>
+
+      {/* Rhythm info cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div className="bg-violet-500/8 border border-violet-500/20 rounded-xl px-4 py-3">
+          <p className="text-white/35 text-[11px] uppercase tracking-wider mb-1">Ырғақ үлгісі</p>
+          <p className="text-violet-300 text-sm font-semibold">{rhythmStr}</p>
+        </div>
+        <div className="bg-amber-500/8 border border-amber-500/20 rounded-xl px-4 py-3">
+          <p className="text-white/35 text-[11px] uppercase tracking-wider mb-1">Өлшем типі</p>
+          <p className="text-amber-300 text-sm font-semibold">{meterType}</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Meter card ─────────────────────────────────────────────────
+function MeterCard({ meter, avgSyl }: { meter: ReturnType<typeof meterName>; avgSyl: number }) {
+  return (
+    <div className="bg-gradient-to-r from-blue-500/10 to-indigo-500/8 border border-blue-500/20 rounded-xl p-4">
+      <div className="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <p className="text-white/35 text-[11px] uppercase tracking-wider mb-1">Өлең өлшемі</p>
+          <p className="text-white text-lg font-bold">{meter.kazakh}</p>
+          <p className="text-blue-300/70 text-xs mt-0.5">{meter.name}</p>
+        </div>
+        <div className="text-right">
+          <p className="text-3xl font-bold text-blue-300">{avgSyl}</p>
+          <p className="text-blue/40 text-xs text-blue-300/50">орта буын</p>
+        </div>
+      </div>
+      <p className="text-white/50 text-xs leading-relaxed mt-3 border-t border-white/6 pt-3">
+        {meter.desc}
+      </p>
+    </div>
+  );
+}
+
+// ── Main PoemStructureDiagram component ────────────────────────
+function PoemStructureDiagram({ text }: { text: string }) {
+  const data = useMemo(() => analyzePoemStructure(text), [text]);
+  const [activeTab, setActiveTab] = useState<'stanza' | 'syllable' | 'rhyme' | 'foot' | 'rhythm'>('stanza');
+
+  if (!data.isPoem || data.lines.length < 4) {
+    return (
+      <div className="rounded-2xl border border-white/8 bg-white/[0.02] px-5 py-8 text-center">
+        <Music2 size={28} className="mx-auto text-white/15 mb-3" />
+        <p className="text-white/30 text-sm">Мәтін поэзиялық емес немесе жол саны аз.</p>
+        <p className="text-white/20 text-xs mt-1">Кем дегенде 4 жол поэзиялық мәтін енгізіңіз.</p>
+      </div>
+    );
+  }
+
+  const tabs: { id: typeof activeTab; label: string; icon: string }[] = [
+    { id: 'stanza',   label: 'Шумақ / Тармақ', icon: '𝄃' },
+    { id: 'syllable', label: 'Буын диаграммасы', icon: '▮' },
+    { id: 'rhyme',    label: 'Ұйқас сызбасы', icon: '◈' },
+    { id: 'foot',     label: 'Бунақ', icon: '⌇' },
+    { id: 'rhythm',   label: 'Ырғақ', icon: '♩' },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Poetry confirmed badge */}
+      <div className="flex items-center gap-2 px-1">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="text-emerald-400 text-xs font-semibold">Поэзиялық мәтін анықталды</span>
+        <span className="text-white/25 text-xs">— 8 элемент талданды</span>
+      </div>
+
+      {/* Summary stats row */}
+      <div className="grid grid-cols-4 sm:grid-cols-4 gap-2">
+        <PoemStatCard value={data.stanzas.length} sub={data.stanzas[0] ? `${data.stanzas[0].length} тармақ` : ''} label="Шумақ" color="violet" />
+        <PoemStatCard value={data.lines.length} sub={`${data.stanzas[0]?.length ?? 4} жол/шумақ`} label="Тармақ" color="amber" />
+        <PoemStatCard value={data.avgSyl} sub={data.meter.name} label="Буын (орта)" color="emerald" />
+        <PoemStatCard value={data.dominantFeet.join('+')} sub={`${data.dominantFeet.length} бунақ`} label="Бунақ үлгісі" color="blue" />
+      </div>
+
+      {/* Meter + Rhythm quick row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <MeterCard meter={data.meter} avgSyl={data.avgSyl} />
+        <div className="bg-fuchsia-500/8 border border-fuchsia-500/20 rounded-xl p-4 flex flex-col justify-between">
+          <p className="text-white/35 text-[11px] uppercase tracking-wider mb-1">Ырғақ</p>
+          <p className="text-fuchsia-300 text-sm font-semibold leading-snug">{data.rhythmStr}</p>
+          <p className="text-white/35 text-[11px] uppercase tracking-wider mt-3 mb-1">Ұйқас</p>
+          <p className="text-pink-300 text-sm font-semibold">{data.rhymeLabel}</p>
+        </div>
+      </div>
+
+      {/* Tab bar */}
+      <div className="flex gap-1 bg-white/[0.03] border border-white/8 rounded-xl p-1 overflow-x-auto">
+        {tabs.map(t => (
+          <button
+            key={t.id}
+            onClick={() => setActiveTab(t.id)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-medium whitespace-nowrap transition-all flex-1 justify-center ${
+              activeTab === t.id
+                ? 'bg-violet-500/25 border border-violet-500/30 text-violet-200'
+                : 'text-white/35 hover:text-white/60 hover:bg-white/5'
+            }`}
+          >
+            <span className="text-base leading-none">{t.icon}</span>
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      <AnimatePresence mode="wait">
+        <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -4 }} transition={{ duration: 0.18 }} className="bg-white/[0.02] border border-white/6 rounded-2xl p-4">
+          {activeTab === 'stanza' && (
+            <div>
+              <p className="text-white/40 text-xs mb-3">Шумақтар мен тармақтар — ұйқас әрпімен белгіленген</p>
+              <StanzaGrid stanzas={data.stanzas} rhymeLetters={data.rhymeLetters} />
+            </div>
+          )}
+          {activeTab === 'syllable' && (
+            <div>
+              <p className="text-white/40 text-xs mb-3">
+                Əр жолдың буын саны · Орта: <span className="text-emerald-400 font-semibold">{data.avgSyl}</span> буын · Тік сызық = орта мән
+              </p>
+              <SyllableChart sylPerLine={data.sylPerLine} avgSyl={data.avgSyl} lines={data.lines} />
+            </div>
+          )}
+          {activeTab === 'rhyme' && (
+            <RhymeSchemeVisual letters={data.rhymeLetters} endings={data.rhymeEndings} rhymeLabel={data.rhymeLabel} />
+          )}
+          {activeTab === 'foot' && (
+            <div>
+              <p className="text-white/40 text-xs mb-3">
+                Бунақ — жолдың ырғақтық бөліктері. Əр түс бір бунақты білдіреді.
+              </p>
+              <FootVisualizer sylPerLine={data.sylPerLine} dominantFeet={data.dominantFeet} lines={data.lines} />
+            </div>
+          )}
+          {activeTab === 'rhythm' && (
+            <div>
+              <p className="text-white/40 text-xs mb-3">
+                Ырғақ үлгісі — биік жолақ екпінді (ауыр) буын, аласа жолақ екпінсіз (жеңіл) буын.
+              </p>
+              <RhythmStrip dominantFeet={data.dominantFeet} rhythmStr={data.rhythmStr} avgSyl={data.avgSyl} />
+            </div>
+          )}
+        </motion.div>
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // ── EngineResultView (12 sections + devices panel) ───────────────────────────
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -1032,41 +1528,9 @@ function EngineResultView({ result, text }: { result: EngineResult; text: string
         )}
       </div>
 
-      {/* 10. Өлең құрылысы */}
-      <SectionCard icon={<Music2 size={15} />} title="10. Өлең құрылысы">
-        <div className="space-y-4">
-          {result.rhymeLetters.length > 0 && (
-            <div>
-              <p className="text-white/35 text-xs uppercase tracking-wider mb-2">Ұйқас схемасы</p>
-              <div className="flex flex-wrap gap-1.5">
-                {result.rhymeLetters.map((letter, i) => (
-                  <div key={i} className="flex flex-col items-center gap-0.5">
-                    <span className={`w-7 h-7 rounded-lg border text-xs font-bold flex items-center justify-center ${rhymeColor(letter)}`}>{letter}</span>
-                    <span className="text-white/20 text-[10px]">{i + 1}</span>
-                  </div>
-                ))}
-              </div>
-              <p className="text-white/40 text-xs mt-2">{result.rhymeLabel}</p>
-            </div>
-          )}
-          {result.syllablesPerLine.length > 0 && (
-            <div>
-              <p className="text-white/35 text-xs uppercase tracking-wider mb-2">Буын саны — жол бойынша</p>
-              <div className="space-y-1">
-                {result.syllablesPerLine.map((syl, i) => (
-                  <div key={i} className="flex items-center gap-2">
-                    <span className="text-white/20 text-[10px] w-4 text-right">{i + 1}</span>
-                    <div className="flex-1 h-1.5 bg-white/5 rounded-full overflow-hidden">
-                      <motion.div initial={{ width: 0 }} animate={{ width: `${Math.min((syl / 14) * 100, 100)}%` }} transition={{ duration: 0.4, delay: i * 0.03 }} className="h-full bg-gradient-to-r from-emerald-500/60 to-teal-400/60 rounded-full" />
-                    </div>
-                    <span className="text-emerald-400/70 text-[11px] font-mono w-4">{syl}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          <InfoRow label="Шумақ түрі" value={result.stanzaType} />
-        </div>
+      {/* 10. Өлең құрылысы — full diagram panel */}
+      <SectionCard icon={<Music2 size={15} />} title="10. Өлең құрылысы" badge="8 элемент">
+        <PoemStructureDiagram text={text} />
       </SectionCard>
 
       {/* 11. Тәрбиелік мәні */}
