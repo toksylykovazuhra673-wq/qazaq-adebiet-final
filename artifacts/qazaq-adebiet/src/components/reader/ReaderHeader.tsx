@@ -1,5 +1,4 @@
 import { motion } from 'framer-motion';
-import { useLocation } from 'wouter';
 import {
   ArrowLeft, ChevronRight, BookOpen, User, Tag, Clock, FileText,
 } from 'lucide-react';
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function ReaderHeader({ book, currentPage, totalPages }: Props) {
-  const [, navigate] = useLocation();
   const progress = totalPages ? Math.round((currentPage / totalPages) * 100) : 0;
 
   return (
@@ -24,7 +22,7 @@ export default function ReaderHeader({ book, currentPage, totalPages }: Props) {
       <div className="flex items-center gap-4">
         {/* Back */}
         <button
-          onClick={() => navigate(-1 as any)}
+          onClick={() => window.history.back()}
           className="flex items-center gap-1.5 text-gray-400 hover:text-white transition-colors text-sm flex-shrink-0"
         >
           <ArrowLeft size={16} />

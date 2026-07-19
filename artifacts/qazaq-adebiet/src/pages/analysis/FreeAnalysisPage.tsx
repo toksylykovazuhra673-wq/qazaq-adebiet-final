@@ -188,7 +188,6 @@ function StatCard({ label, value }: { label: string; value: string | number }) {
 
 // ─── Main Page ────────────────────────────────────────────────
 export default function FreeAnalysisPage() {
-  const [, navigate] = useLocation();
   // Support ?text= pre-fill from PoemsTab "Талдау" button
   const initialText = typeof window !== 'undefined'
     ? decodeURIComponent(new URLSearchParams(window.location.search).get('text') ?? '')
@@ -214,7 +213,7 @@ export default function FreeAnalysisPage() {
 
         {/* Back */}
         <button
-          onClick={() => navigate(-1 as any)}
+          onClick={() => window.history.back()}
           className="flex items-center gap-2 text-white/50 hover:text-white mb-8 transition-colors text-sm"
         >
           <ArrowLeft size={15} /> Артқа

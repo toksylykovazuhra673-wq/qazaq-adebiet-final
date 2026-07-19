@@ -116,7 +116,7 @@ export default function WorkDetailPage() {
       {/* Hero */}
       <div className="bg-gradient-to-b from-gray-900 to-gray-950 border-b border-white/5">
         <div className="max-w-4xl mx-auto px-4 sm:px-8 py-10">
-          <button onClick={() => navigate(-1 as any)}
+          <button onClick={() => window.history.back()}
             className="flex items-center gap-2 text-gray-400 hover:text-white mb-8 transition-colors text-sm">
             <ArrowLeft size={16} />Артқа
           </button>

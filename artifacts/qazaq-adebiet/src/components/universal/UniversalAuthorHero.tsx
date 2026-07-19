@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, MessageSquare, Eye, Star, MapPin, Calendar } from 'lucide-react';
-import { useLocation } from 'wouter';
 import type { UniversalAuthor } from '@/types/universal-author';
 import { CATEGORY_COLORS, CATEGORY_ACCENT, CATEGORY_BADGE } from '@/hooks/useUniversalAuthor';
 
@@ -9,7 +8,6 @@ interface Props {
 }
 
 export default function UniversalAuthorHero({ author }: Props) {
-  const [, navigate] = useLocation();
   const gradient = CATEGORY_COLORS[author.category];
   const accent = CATEGORY_ACCENT[author.category];
   const badge = CATEGORY_BADGE[author.category];
@@ -41,7 +39,7 @@ export default function UniversalAuthorHero({ author }: Props) {
         <motion.button
           initial={{ opacity: 0, x: -20 }}
           animate={{ opacity: 1, x: 0 }}
-          onClick={() => navigate(-1 as any)}
+          onClick={() => window.history.back()}
           className="absolute top-6 left-6 flex items-center gap-2 text-white/80 hover:text-white transition-colors bg-black/30 backdrop-blur-sm px-4 py-2 rounded-full border border-white/10"
         >
           <ArrowLeft size={16} />

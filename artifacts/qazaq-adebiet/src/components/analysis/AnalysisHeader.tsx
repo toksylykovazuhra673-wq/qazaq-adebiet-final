@@ -1,6 +1,5 @@
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, Clock, Layers, Sparkles, Heart } from 'lucide-react';
-import { useLocation } from 'wouter';
 import type { Analysis } from '@/types/analysis';
 import ExportButtons from './ExportButtons';
 
@@ -16,8 +15,6 @@ const META_CARDS = (a: Analysis) => [
 ];
 
 export default function AnalysisHeader({ analysis }: AnalysisHeaderProps) {
-  const [, navigate] = useLocation();
-
   const initials = analysis.author
     .split(' ')
     .map((w) => w[0])
@@ -30,7 +27,7 @@ export default function AnalysisHeader({ analysis }: AnalysisHeaderProps) {
       {/* back + export row */}
       <div className="flex items-center justify-between mb-6 flex-wrap gap-4">
         <button
-          onClick={() => navigate(-1 as unknown as string)}
+          onClick={() => window.history.back()}
           className="flex items-center gap-2 text-white/50 hover:text-white transition-colors text-sm group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />

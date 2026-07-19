@@ -51,7 +51,6 @@ h1{color:#1e1b4b}h2{color:#4c1d95;border-bottom:2px solid #e9d5ff;padding-bottom
 
 // ── Component ────────────────────────────────────────────────
 export default function AnalysisTopBar({ analysis }: { analysis: Analysis }) {
-  const [, navigate] = useLocation();
   const [showDownload, setShowDownload] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [starred, setStarred] = useState(false);
@@ -78,7 +77,7 @@ export default function AnalysisTopBar({ analysis }: { analysis: Analysis }) {
       <div className="max-w-6xl mx-auto px-4 h-14 flex items-center gap-3">
         {/* Back */}
         <button
-          onClick={() => navigate(-1 as any)}
+          onClick={() => window.history.back()}
           className="flex items-center gap-1.5 text-white/60 hover:text-white transition-colors text-sm font-medium shrink-0"
         >
           <ArrowLeft size={16} /> Артқа
