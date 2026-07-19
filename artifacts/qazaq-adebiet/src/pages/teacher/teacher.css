@@ -1,0 +1,30 @@
+/* Shared utility classes for Teacher Dashboard tabs */
+@reference "../../index.css";
+
+.input-field {
+  @apply w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5
+    text-sm text-white placeholder-gray-600
+    focus:outline-none focus:border-violet-500/50
+    transition-colors;
+}
+
+select.input-field option {
+  background: #111827;
+  color: #e5e7eb;
+}
+
+.btn-primary {
+  @apply flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
+    bg-gradient-to-r from-violet-600 to-purple-600
+    hover:from-violet-500 hover:to-purple-500
+    text-white font-semibold text-sm
+    transition-all shadow-lg
+    disabled:opacity-40 disabled:cursor-not-allowed;
+}
+
+.btn-ghost {
+  @apply flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl
+    border border-white/10 text-gray-400
+    hover:text-white hover:bg-white/5
+    text-sm font-medium transition-all;
+}

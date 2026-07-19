@@ -74,6 +74,15 @@ export default function Header() {
                 Кабинет
               </Link>
 
+              {/* Teacher button */}
+              <Link href="/mugalim"
+                className="hidden lg:flex items-center gap-1.5 px-3 py-1.5 rounded-xl
+                  bg-emerald-500/15 border border-emerald-500/30 text-emerald-300
+                  hover:bg-emerald-500/25 transition-all text-sm font-medium">
+                <GraduationCap size={14} />
+                Мұғалім
+              </Link>
+
               <div className="relative flex items-center">
                 <AnimatePresence>
                   {isSearchOpen && (

@@ -28,7 +28,8 @@ import AnalysisPage       from '@/pages/analysis/AnalysisPage';
 import FreeAnalysisPage   from '@/pages/analysis/FreeAnalysisPage';
 import InteractivePage    from '@/pages/interactive/InteractivePage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
-import StudentCabinetPage from '@/pages/cabinet/StudentCabinetPage';
+import StudentCabinetPage    from '@/pages/cabinet/StudentCabinetPage';
+import TeacherDashboardPage from '@/pages/teacher/TeacherDashboardPage';
 import NotFound from '@/pages/not-found';
 
 const queryClient = new QueryClient();
@@ -170,6 +171,11 @@ function Router() {
       {/* Student Cabinet — /cabinet */}
       <Route path="/cabinet">
         {() => <StudentCabinetPage />}
+      </Route>
+
+      {/* Teacher Dashboard — /mugalim */}
+      <Route path="/mugalim">
+        {() => <TeacherDashboardPage />}
       </Route>
 
       <Route>
