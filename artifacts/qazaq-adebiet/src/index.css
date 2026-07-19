@@ -69,9 +69,9 @@
   --popover-foreground:  250 35% 10%;
   --popover-border:      250 18% 88%;
 
-  --body-bg-start: #f5f3ff;
-  --body-bg-mid:   #ede9ff;
-  --body-bg-end:   #e8f0ff;
+  --body-bg-start: #c4b5fd;
+  --body-bg-mid:   #a78bfa;
+  --body-bg-end:   #818cf8;
 
   --app-font-sans:  'Inter', sans-serif;
   --app-font-serif: 'Playfair Display', serif;
@@ -103,9 +103,9 @@
   --popover-foreground:  0 0% 98%;
   --popover-border:      250 20% 20%;
 
-  --body-bg-start: #0a0618;
-  --body-bg-mid:   #0f0c29;
-  --body-bg-end:   #0d1840;
+  --body-bg-start: #1c0838;
+  --body-bg-mid:   #17084f;
+  --body-bg-end:   #0e1b5e;
 }
 
 @layer base {

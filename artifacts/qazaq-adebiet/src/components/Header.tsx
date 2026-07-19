@@ -167,7 +167,7 @@ export default function Header() {
             <div className="mt-auto">
               <div className="glass-panel p-4 rounded-xl">
                 <p className="text-sm text-muted-foreground text-center">
-                  Қазақ Әдебиеті Порталы © 2025
+                  «Қазақ әдебиеті» · Цифрлық білім беру платформасы © 2025
                 </p>
               </div>
             </div>

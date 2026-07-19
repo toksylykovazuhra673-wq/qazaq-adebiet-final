@@ -19,7 +19,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-muted-foreground text-sm leading-relaxed max-w-xs">
-              Ұлы ақындар, жазушылар мен жыраулардың мұрасы — бір жерде. Қазақ әдебиетінің байлығын бізбен бірге зерттеңіз.
+              Қазақ әдебиетінің мол мұрасын зерттейтін цифрлық білім беру платформасы. Оқы, үйрен, дамы.
             </p>
           </div>
 
@@ -70,7 +70,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-sm text-white/40">
-            © 2025 QazaqAdebiet. Барлық құқықтар қорғалған.
+            © 2025 «Қазақ әдебиеті» · Цифрлық білім беру платформасы. Барлық құқықтар қорғалған.
           </p>
           <div className="flex items-center gap-6 text-sm text-white/40">
             <Link href="/" className="hover:text-white transition-colors">Құпиялық саясаты</Link>
