@@ -53,9 +53,10 @@ export default function HeroSection() {
             className="mb-8"
           >
             <span className="inline-flex items-center gap-2 py-2 px-5 rounded-full
-              border border-white/25 bg-white/10 backdrop-blur-md
-              text-white text-sm font-medium tracking-wide shadow-lg">
-              <BookOpen size={14} className="text-amber-300" />
+              border border-gray-900/20 bg-gray-900/10
+              dark:border-white/25 dark:bg-white/10 backdrop-blur-md
+              text-gray-900 dark:text-white text-sm font-medium tracking-wide shadow-lg">
+              <BookOpen size={14} className="text-amber-600 dark:text-amber-300" />
               Цифрлық білім беру платформасы
             </span>
           </motion.div>
@@ -67,16 +68,14 @@ export default function HeroSection() {
             transition={{ duration: 0.8, delay: 0.1 }}
             className="font-serif font-bold leading-[1.1] mb-6"
           >
-            {/* Quoted brand name */}
-            <span className="block text-5xl md:text-7xl lg:text-8xl text-white drop-shadow-xl">
+            <span className="block text-5xl md:text-7xl lg:text-8xl
+              text-gray-900 dark:text-white drop-shadow-sm">
               «Қазақ әдебиеті»
             </span>
-            {/* Subtitle line */}
             <span className="block text-3xl md:text-5xl lg:text-6xl mt-3
-              text-white/90 font-light tracking-wide">
+              text-gray-800 dark:text-white/90 font-light tracking-wide">
               цифрлық білім беру
             </span>
-            {/* Accent line */}
             <span className="block text-3xl md:text-5xl lg:text-6xl mt-1
               text-gradient text-gradient-gold font-bold">
               платформасы

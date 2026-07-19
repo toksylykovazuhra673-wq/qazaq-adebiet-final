@@ -7,7 +7,8 @@ export type TeachTab =
   | 'grades'
   | 'analytics'
   | 'certificates'
-  | 'lessonplans';
+  | 'lessonplans'
+  | 'uploads';
 
 export interface TeacherProfile {
   name: string;

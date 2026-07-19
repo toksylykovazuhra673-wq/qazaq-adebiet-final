@@ -4,7 +4,7 @@ import { useLocation } from 'wouter';
 import {
   GraduationCap, Users, Target, BookOpen, BarChart3,
   Award, FileText, ChevronLeft, Edit3, Check, X,
-  Zap, TrendingUp, AlertCircle,
+  Zap, TrendingUp, AlertCircle, Upload,
 } from 'lucide-react';
 
 import { useTeacherDashboard } from '@/hooks/useTeacherDashboard';
@@ -17,6 +17,7 @@ import TchGrades      from './tabs/TchGrades';
 import TchAnalytics   from './tabs/TchAnalytics';
 import TchCertificates from './tabs/TchCertificates';
 import TchLessonPlans from './tabs/TchLessonPlans';
+import TchUploads     from './tabs/TchUploads';
 
 // ── Global button / input styles injected via a style tag ─────────────────
 import './teacher.css';
@@ -30,6 +31,7 @@ const TABS: { id: TeachTab; label: string; short: string; Icon: React.ElementTyp
   { id: 'analytics',   label: 'Статистика',      short: 'Стат.',   Icon: BarChart3     },
   { id: 'certificates',label: 'Сертификаттар',   short: 'Серт.',   Icon: Award         },
   { id: 'lessonplans', label: 'ҚМЖ / БЖБ / ТЖБ', short: 'Жоспар', Icon: FileText      },
+  { id: 'uploads',     label: 'Менің шығармаларым', short: 'PDF',  Icon: Upload        },
 ];
 
 // ── Profile Modal ───────────────────────────────────────────────────────────
@@ -336,6 +338,10 @@ export default function TeacherDashboardPage() {
                   onUpdate={updateLessonPlan}
                   onDelete={deleteLessonPlan}
                 />
+              )}
+
+              {activeTab === 'uploads' && (
+                <TchUploads teacherName={data.profile.name} />
               )}
             </motion.div>
           </AnimatePresence>
