@@ -1,6 +1,7 @@
 import React from 'react';
 import { FileText } from 'lucide-react';
 import type { Writer } from '@/types/writer';
+import ItemPdfButton from '@/components/shared/ItemPdfButton';
 
 export default function WriterArticlesTab({ writer }: { writer: Writer }) {
   if (!writer.articles || writer.articles.length === 0) {
@@ -18,10 +19,15 @@ export default function WriterArticlesTab({ writer }: { writer: Writer }) {
           <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center shrink-0 mt-1">
             <FileText className="w-5 h-5 text-white/50" />
           </div>
-          <div>
+          <div className="flex-1 min-w-0">
             <h3 className="font-serif text-white text-xl mb-1">{article.title}</h3>
             <p className="text-accent text-sm mb-2">{article.year}</p>
             <p className="text-white/70 text-sm">{article.description}</p>
+            <ItemPdfButton
+              ownerSlug={writer.slug}
+              itemId={`article-${article.id}`}
+              itemTitle={article.title}
+            />
           </div>
         </div>
       ))}

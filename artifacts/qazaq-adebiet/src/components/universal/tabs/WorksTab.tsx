@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Library, Search, FileText, Headphones, Download, ExternalLink } from 'lucide-react';
+import { Library, Search, Headphones, ExternalLink } from 'lucide-react';
 import { useLocation } from 'wouter';
 import type { UniversalAuthor } from '@/types/universal-author';
 import { CATEGORY_ACCENT } from '@/hooks/useUniversalAuthor';
+import ItemPdfButton from '@/components/shared/ItemPdfButton';
 
 interface Props { author: UniversalAuthor }
 
@@ -12,15 +13,14 @@ export default function WorksTab({ author }: Props) {
   const [, navigate] = useLocation();
   const accent = CATEGORY_ACCENT[author.category];
 
-  // Aggregate all works into one catalog
   const allWorks = [
-    ...(author.poems ?? []).map(w => ({ ...w, type: 'Өлең', slug: `poem-${w.id}` })),
-    ...(author.longPoems ?? []).map(w => ({ ...w, type: 'Поэма', slug: `longpoem-${w.id}` })),
-    ...(author.novels ?? []).map(w => ({ ...w, type: 'Роман' })),
-    ...(author.stories ?? []).map(w => ({ ...w, type: 'Әңгіме', slug: `story-${w.id}` })),
-    ...(author.scientificWorks ?? []).map(w => ({ ...w, type: 'Ғылыми еңбек', slug: `science-${w.id}` })),
-    ...(author.articles ?? []).map(w => ({ ...w, type: 'Мақала', slug: `article-${w.id}` })),
-    ...(author.oratories ?? []).map(w => ({ ...w, type: 'Шешендік сөз', slug: `oratory-${w.id}` })),
+    ...(author.poems ?? []).map(w => ({ ...w, type: 'Өлең', slug: `poem-${w.id}`, pfxId: `poem-${w.id}` })),
+    ...(author.longPoems ?? []).map(w => ({ ...w, type: 'Поэма', slug: `longpoem-${w.id}`, pfxId: `longpoem-${w.id}` })),
+    ...(author.novels ?? []).map(w => ({ ...w, type: 'Роман', pfxId: `novel-${w.id}` })),
+    ...(author.stories ?? []).map(w => ({ ...w, type: 'Әңгіме', slug: `story-${w.id}`, pfxId: `story-${w.id}` })),
+    ...(author.scientificWorks ?? []).map(w => ({ ...w, type: 'Ғылыми еңбек', slug: `science-${w.id}`, pfxId: `sci-${w.id}` })),
+    ...(author.articles ?? []).map(w => ({ ...w, type: 'Мақала', slug: `article-${w.id}`, pfxId: `article-${w.id}` })),
+    ...(author.oratories ?? []).map(w => ({ ...w, type: 'Шешендік сөз', slug: `oratory-${w.id}`, pfxId: `oratory-${w.id}` })),
   ];
 
   const filtered = allWorks.filter(w =>
@@ -58,10 +58,9 @@ export default function WorksTab({ author }: Props) {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: Math.min(i * 0.04, 0.5) }}
-            className="bg-white/3 border border-white/8 rounded-xl p-4 hover:bg-white/5 hover:border-white/15 transition-all group"
+            className="bg-white/3 border border-white/8 rounded-xl p-4 hover:bg-white/5 hover:border-white/15 transition-all group flex flex-col"
           >
-            {/* Type badge */}
-            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-white/8 text-gray-300 border border-white/10">
+            <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-white/8 text-gray-300 border border-white/10 self-start">
               {work.type}
             </span>
 
@@ -72,35 +71,34 @@ export default function WorksTab({ author }: Props) {
             {work.year && <p className="text-gray-500 text-xs mb-2">{work.year}</p>}
 
             {('description' in work) && (work as any).description && (
-              <p className="text-gray-400 text-xs leading-relaxed mb-3 line-clamp-2">
+              <p className="text-gray-400 text-xs leading-relaxed mb-2 line-clamp-2 flex-1">
                 {(work as any).description}
               </p>
             )}
 
-            {/* Action buttons */}
-            <div className="flex gap-2 mt-auto">
-              {work.slug && (
+            {/* Existing action buttons */}
+            <div className="flex gap-2 flex-wrap">
+              {(work as any).slug && (
                 <button
-                  onClick={() => navigate(`/works/${work.slug}`)}
+                  onClick={() => navigate(`/works/${(work as any).slug}`)}
                   className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/15 text-gray-300 transition-colors"
                 >
-                  <ExternalLink size={11} />
-                  Оқу
-                </button>
-              )}
-              {(work as any).hasPdf && (
-                <button className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/15 text-gray-300 transition-colors">
-                  <Download size={11} />
-                  PDF
+                  <ExternalLink size={11} /> Оқу
                 </button>
               )}
               {(work as any).hasAudio && (
                 <button className="flex items-center gap-1 text-xs px-3 py-1.5 rounded-lg bg-white/8 hover:bg-white/15 text-gray-300 transition-colors">
-                  <Headphones size={11} />
-                  Аудио
+                  <Headphones size={11} /> Аудио
                 </button>
               )}
             </div>
+
+            {/* PDF button */}
+            <ItemPdfButton
+              ownerSlug={author.slug}
+              itemId={work.pfxId}
+              itemTitle={work.title}
+            />
           </motion.div>
         ))}
       </div>

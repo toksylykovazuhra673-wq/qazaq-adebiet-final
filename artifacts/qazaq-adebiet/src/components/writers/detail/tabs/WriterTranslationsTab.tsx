@@ -1,13 +1,14 @@
 import { motion } from 'framer-motion';
 import { Globe } from 'lucide-react';
 import type { Writer, WriterTranslation } from '@/types/writer';
+import ItemPdfButton from '@/components/shared/ItemPdfButton';
 
 const LANG_FLAGS: Record<string, string> = {
   'орысша': '🇷🇺', 'ағылшынша': '🇬🇧', 'неміс тілінде': '🇩🇪',
   'француз тілінде': '🇫🇷', 'қытайша': '🇨🇳', 'түрікше': '🇹🇷', 'арабша': '🇸🇦',
 };
 
-function TranslationCard({ t, index }: { t: WriterTranslation; index: number }) {
+function TranslationCard({ t, index, writerSlug }: { t: WriterTranslation; index: number; writerSlug: string }) {
   const flag = LANG_FLAGS[t.originalLanguage.toLowerCase()] ?? '🌐';
   return (
     <motion.div
@@ -25,6 +26,11 @@ function TranslationCard({ t, index }: { t: WriterTranslation; index: number }) 
           </div>
           <p className="text-white/50 text-xs mb-1">{t.originalLanguage} · {t.author}</p>
           {t.description && <p className="text-white/45 text-sm leading-relaxed">{t.description}</p>}
+          <ItemPdfButton
+            ownerSlug={writerSlug}
+            itemId={`translation-${t.id}`}
+            itemTitle={t.title}
+          />
         </div>
       </div>
     </motion.div>
@@ -48,7 +54,9 @@ export default function WriterTranslationsTab({ writer }: { writer: Writer }) {
       <h2 className="text-white text-xl font-bold mb-2">Аудармалары</h2>
       <p className="text-white/35 text-sm mb-6">{items.length} аударма</p>
       <div className="space-y-3">
-        {items.map((t, i) => <TranslationCard key={t.id} t={t} index={i} />)}
+        {items.map((t, i) => (
+          <TranslationCard key={t.id} t={t} index={i} writerSlug={writer.slug} />
+        ))}
       </div>
     </div>
   );
