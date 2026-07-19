@@ -24,6 +24,7 @@ import PdfReaderPage      from '@/pages/reader/PdfReaderPage';
 import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
 import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
 import AnalysisPage       from '@/pages/analysis/AnalysisPage';
+import FreeAnalysisPage   from '@/pages/analysis/FreeAnalysisPage';
 import InteractivePage    from '@/pages/interactive/InteractivePage';
 import AuthorDetailPage from '@/pages/AuthorDetailPage';
 import NotFound from '@/pages/not-found';
@@ -71,7 +72,7 @@ function Router() {
         {() => <AppShell><PdfLibraryPage /></AppShell>}
       </Route>
       <Route path="/taldau">
-        {() => { window.location.replace('/analysis/abai-qara-sozder'); return null; }}
+        {() => <AppShell><FreeAnalysisPage /></AppShell>}
       </Route>
       <Route path="/oyyndar">
         {() => <InteractivePage />}
@@ -95,10 +96,10 @@ function Router() {
       </Route>
 
       <Route path="/bi-sheshender">
-        {() => <BiPage />}
+        {() => <AppShell><BiPage /></AppShell>}
       </Route>
       <Route path="/bi-sheshender/:slug">
-        {() => <BiDetailPage />}
+        {() => <AppShell><BiDetailPage /></AppShell>}
       </Route>
 
       <Route path="/educators">
@@ -142,6 +143,11 @@ function Router() {
       {/* Digital Reading System — /reader/:slug (no AppShell — immersive reader) */}
       <Route path="/reader/:slug">
         {() => <DigitalReaderPage />}
+      </Route>
+
+      {/* Free text poem analyzer — /analysis (no workSlug) */}
+      <Route path="/analysis">
+        {() => <AppShell><FreeAnalysisPage /></AppShell>}
       </Route>
 
       {/* Automatic Literary Analysis — /analysis/:workSlug (no AppShell — full screen) */}

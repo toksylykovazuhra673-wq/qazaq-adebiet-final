@@ -13,6 +13,8 @@ export interface PoetWork {
   hasRead: boolean;
   hasPdf: boolean;
   hasAudio: boolean;
+  /** Optional slug for digital reader navigation, e.g. "abai-qara-sozder" */
+  readerSlug?: string;
 }
 
 export interface PoetPoem {
