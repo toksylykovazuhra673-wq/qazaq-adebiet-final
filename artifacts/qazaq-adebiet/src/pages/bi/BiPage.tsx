@@ -16,7 +16,7 @@ export default function BiPage() {
   const handleSuccess = (slug: string) => { setModalOpen(false); navigate(`/bi-sheshender/${slug}`); };
 
   return (
-    <div className="min-h-screen pb-24">
+    <div className="min-h-screen pb-24 bg-[#070514]">
       <BiHero filter={filter} suggestions={suggestions} setFilter={setFilter} total={total} />
       <BiFilterBar filter={filter} setFilter={setFilter} resetFilter={resetFilter} count={biList.length} />
       <div className="container mx-auto px-4 lg:px-8 mt-8">

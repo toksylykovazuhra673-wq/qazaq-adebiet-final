@@ -16,7 +16,7 @@ export default function BiCard({ bi, index = 0 }: Props) {
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
       whileHover={{ y: -4 }}
-      className="group relative glass-card rounded-2xl overflow-hidden border border-white/8 hover:border-teal-500/30 transition-all duration-300 flex flex-col"
+      className="group relative rounded-2xl overflow-hidden border border-white/10 hover:border-teal-500/40 transition-all duration-300 flex flex-col bg-[#111c35] hover:bg-[#132038] shadow-xl shadow-black/30"
     >
       {/* Top gradient */}
       <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-teal-500/0 via-teal-500/60 to-amber-500/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
