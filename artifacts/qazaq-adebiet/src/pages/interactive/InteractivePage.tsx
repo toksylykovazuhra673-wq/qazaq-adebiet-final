@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
-import { GraduationCap, Gamepad2, Users, LayoutGrid } from 'lucide-react';
+import { GraduationCap, Gamepad2, Users, LayoutGrid, ArrowLeft } from 'lucide-react';
+import { useLocation } from 'wouter';
 import { useTaskLab } from '@/hooks/useTaskLab';
 import { useProgress } from '@/hooks/useProgress';
 import type { Task, TaskResult } from '@/types/task';
@@ -22,6 +23,7 @@ const TABS: { id: Tab; label: string; icon: React.ReactNode }[] = [
 ];
 
 export default function InteractivePage() {
+  const [, navigate] = useLocation();
   const lab = useTaskLab();
   const prog = useProgress();
   const [tab, setTab] = useState<Tab>('tasks');
@@ -68,6 +70,17 @@ export default function InteractivePage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-950 via-[#0d0d1a] to-slate-950">
       <div className="max-w-7xl mx-auto px-4 py-8 md:px-6">
+
+        {/* ── BACK BUTTON ── */}
+        <button
+          onClick={() => navigate(-1 as any)}
+          className="flex items-center gap-2 text-white/50 hover:text-white mb-6 transition-colors text-sm group"
+        >
+          <span className="w-8 h-8 rounded-xl bg-white/5 border border-white/8 flex items-center justify-center group-hover:bg-white/10 group-hover:border-white/15 transition-colors">
+            <ArrowLeft size={15} />
+          </span>
+          Артқа қайту
+        </button>
 
         {/* ── HERO ── */}
         <HeroSection
