@@ -56,7 +56,7 @@ export default function RecentMaterialsSection() {
                   <h3 className="font-serif text-lg text-white truncate pr-4 group-hover:text-primary transition-colors">
                     {item.title}
                   </h3>
-                  <span className="text-xs px-2 py-1 rounded bg-white/5 border border-white/10 text-white/60 whitespace-nowrap">
+                  <span className="text-xs px-2 py-1 rounded bg-violet-500/10 border border-violet-500/25 text-violet-200 whitespace-nowrap">
                     {item.category}
                   </span>
                 </div>
@@ -65,11 +65,11 @@ export default function RecentMaterialsSection() {
                   <p className="text-sm text-primary mb-2">{item.author}</p>
                 )}
                 
-                <p className="text-sm text-white/50 line-clamp-1 mb-3">
+                <p className="text-sm text-violet-200 line-clamp-1 mb-3">
                   {item.description}
                 </p>
                 
-                <div className="flex items-center gap-1.5 text-xs text-white/40">
+                <div className="flex items-center gap-1.5 text-xs text-violet-300">
                   <Calendar className="w-3.5 h-3.5" />
                   <span>{new Date(item.addedDate).toLocaleDateString('kk-KZ')}</span>
                 </div>

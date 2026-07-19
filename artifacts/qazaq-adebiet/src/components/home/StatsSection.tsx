@@ -66,7 +66,7 @@ export default function StatsSection() {
               <h3 className="text-3xl md:text-4xl font-serif font-bold text-white mb-1">
                 <Counter value={stat.value} />+
               </h3>
-              <p className="text-white/60 text-sm">{stat.label}</p>
+              <p className="text-violet-200 text-sm font-medium">{stat.label}</p>
             </motion.div>
           ))}
         </div>

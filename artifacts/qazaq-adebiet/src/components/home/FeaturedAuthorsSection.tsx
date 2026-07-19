@@ -63,14 +63,14 @@ export default function FeaturedAuthorsSection() {
                   <span className="text-accent">{author.years}</span>
                 </div>
                 
-                <p className="text-sm text-white/60 mb-6 line-clamp-2 px-2">
+                <p className="text-sm text-violet-200 mb-6 line-clamp-2 px-2">
                   {author.description}
                 </p>
                 
                 <div className="mt-auto pt-4 border-t border-white/10 w-full">
                   <Link 
                     href={`/author/${author.slug}`}
-                    className="inline-block w-full py-2 rounded-lg bg-white/5 hover:bg-primary/20 hover:text-white text-white/80 transition-colors text-sm font-medium"
+                    className="inline-block w-full py-2 rounded-lg bg-violet-500/10 hover:bg-violet-500/25 hover:text-white text-violet-200 border border-violet-500/20 transition-colors text-sm font-medium"
                   >
                     Толығырақ
                   </Link>

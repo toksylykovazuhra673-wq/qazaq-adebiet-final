@@ -51,10 +51,10 @@ export default function CategoriesSection() {
                   </div>
                   
                   <h3 className="text-xl font-serif text-white mb-2 relative z-10">{category.label}</h3>
-                  <p className="text-sm text-white/60 mb-6 flex-1 relative z-10">{category.description}</p>
+                  <p className="text-sm text-violet-200 mb-6 flex-1 relative z-10">{category.description}</p>
                   
                   <div className="flex items-center justify-between mt-auto relative z-10 border-t border-white/10 pt-4">
-                    <span className="text-xs font-medium bg-white/5 px-2 py-1 rounded text-white/70">
+                    <span className="text-xs font-medium bg-violet-500/10 px-2 py-1 rounded text-violet-200 border border-violet-500/20">
                       {category.count} автор
                     </span>
                     <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-primary transition-colors">

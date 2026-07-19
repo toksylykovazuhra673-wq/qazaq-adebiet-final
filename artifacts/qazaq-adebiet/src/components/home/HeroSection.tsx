@@ -86,7 +86,7 @@ export default function HeroSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.3 }}
-            className="text-lg md:text-xl text-white/80 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
+            className="text-lg md:text-xl text-violet-100 mb-10 max-w-2xl mx-auto font-light leading-relaxed"
           >
             Ұлы ақындар, жазушылар мен жыраулардың мұрасы — бір жерде.
             <br className="hidden md:block" />
@@ -160,10 +160,10 @@ export default function HeroSection() {
               <React.Fragment key={cat.label}>
                 <Link
                   href={cat.href}
-                  className="text-sm text-white/70 hover:text-white transition-colors px-2 py-1">
+                  className="text-sm text-violet-200 hover:text-white transition-colors px-2 py-1">
                   {cat.label}
                 </Link>
-                {i < arr.length - 1 && <span className="text-white/25">•</span>}
+                {i < arr.length - 1 && <span className="text-violet-400/50">•</span>}
               </React.Fragment>
             ))}
           </motion.div>
@@ -177,7 +177,7 @@ export default function HeroSection() {
         transition={{ delay: 1.5, duration: 1 }}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        <span className="text-white/40 text-xs tracking-widest uppercase">Төменге</span>
+        <span className="text-violet-300 text-xs tracking-widest uppercase">Төменге</span>
         <motion.div
           animate={{ y: [0, 8, 0] }}
           transition={{ duration: 1.5, repeat: Infinity }}
