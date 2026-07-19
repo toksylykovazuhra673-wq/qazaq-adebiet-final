@@ -90,6 +90,65 @@ export interface Place {
   lon: number;
 }
 
+// ── New interfaces ─────────────────────────────────────────
+export interface WordCloudItem { word: string; count: number; }
+
+export interface TestQuestion {
+  q: string;
+  options: string[];
+  answer: number;
+}
+
+export interface OlympiadQuestion {
+  q: string;
+  answer?: string;
+  grade: string;
+  hint?: string;
+}
+
+export interface OlympiadSection {
+  easy: OlympiadQuestion[];
+  medium: OlympiadQuestion[];
+  hard: OlympiadQuestion[];
+  republican?: OlympiadQuestion[];
+}
+
+export interface LessonPlanActivity { step: number; name: string; description: string; }
+
+export interface RubricCriterion {
+  criterion: string;
+  '4': string; '3': string; '2': string; '1': string;
+}
+
+export interface LessonPlan {
+  subject: string;
+  grade: string;
+  duration: string;
+  topic: string;
+  objectives: string[];
+  activities: LessonPlanActivity[];
+  assessment: string;
+  descriptors: string[];
+  rubric: RubricCriterion[];
+}
+
+export interface Flashcard { front: string; back: string; }
+
+export interface StudentMaterials {
+  summary: string;
+  keywords: string[];
+  flashcards: Flashcard[];
+  keyThoughts: string[];
+}
+
+export interface InteractiveExercises {
+  matching: { left: string; right: string }[];
+  compositionOrdering: { order: number; key: string; name: string }[];
+  characterMatching: { character: string; role: string }[];
+  fillInBlanks: { text: string; answer: string }[];
+}
+
+// ── Main Analysis interface (extended) ──────────────────────
 export interface Analysis {
   workSlug: string;
   author: string;
@@ -113,4 +172,30 @@ export interface Analysis {
   chronology: ChronologyEvent[];
   places: Place[];
   interestingFacts: string[];
+  // ── Optional extended fields ────────────────────────────
+  coverGradient?: string[];
+  pageCount?: number;
+  readingTime?: string;
+  readingLevel?: string;
+  language?: string;
+  rating?: number;
+  viewCount?: number;
+  downloadCount?: number;
+  summary?: string;
+  authorPortrait?: string;
+  historicalContext?: string;
+  philosophicalMeaning?: string;
+  educationalValue?: string;
+  modernRelevance?: string;
+  nationalValue?: string;
+  globalValue?: string;
+  poemStructure?: null | Record<string, unknown>;
+  synopsis?: string;
+  keyWords?: WordCloudItem[];
+  deviceStatistics?: Record<string, number>;
+  test?: TestQuestion[];
+  olympiad?: OlympiadSection;
+  lessonPlan?: LessonPlan;
+  studentMaterials?: StudentMaterials;
+  interactiveExercises?: InteractiveExercises;
 }
