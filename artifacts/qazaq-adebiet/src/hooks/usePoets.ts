@@ -4,12 +4,65 @@
  * All components that display poets read from this hook.
  * Adding a new poet to src/data/poets.json is all that is needed —
  * no code changes anywhere else are required.
+ * Custom poets added via the UI are stored in localStorage.
  */
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import rawPoets from '@/data/poets.json';
 import type { Poet, PoetsFilter, CenturyFilter, MovementFilter, SortOption } from '@/types/poet';
 
-const ALL_POETS = rawPoets as Poet[];
+const STATIC_POETS = rawPoets as Poet[];
+
+// ── localStorage helpers ──────────────────────────────────────────────────────
+
+const LS_KEY = 'qazaq_adebiet_custom_poets';
+const CHANGE_EVENT = 'poets-data-changed';
+
+export function loadCustomPoets(): Poet[] {
+  try {
+    const stored = localStorage.getItem(LS_KEY);
+    return stored ? (JSON.parse(stored) as Poet[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function saveCustomPoet(poet: Poet): void {
+  try {
+    const existing = loadCustomPoets();
+    const updated = [...existing.filter((p) => p.slug !== poet.slug), poet];
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+  } catch {
+    // ignore
+  }
+}
+
+export function deleteCustomPoet(slug: string): void {
+  try {
+    const existing = loadCustomPoets();
+    const updated = existing.filter((p) => p.slug !== slug);
+    localStorage.setItem(LS_KEY, JSON.stringify(updated));
+    window.dispatchEvent(new CustomEvent(CHANGE_EVENT));
+  } catch {
+    // ignore
+  }
+}
+
+/** Returns merged list: static JSON + custom localStorage */
+function useAllPoets(): Poet[] {
+  const [custom, setCustom] = useState<Poet[]>(() => loadCustomPoets());
+
+  useEffect(() => {
+    const handler = () => setCustom(loadCustomPoets());
+    window.addEventListener(CHANGE_EVENT, handler);
+    return () => window.removeEventListener(CHANGE_EVENT, handler);
+  }, []);
+
+  return useMemo(() => [...STATIC_POETS, ...custom], [custom]);
+}
+
+/** @deprecated use useAllPoets() inside components instead */
+const ALL_POETS = STATIC_POETS;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
@@ -56,6 +109,7 @@ function sortPoets(poets: Poet[], sort: SortOption): Poet[] {
 // ── hook ─────────────────────────────────────────────────────────────────────
 
 export function usePoets() {
+  const allPoets = useAllPoets();
   const [filter, setFilter] = useState<PoetsFilter>({
     search: '',
     century: 'all',
@@ -64,20 +118,20 @@ export function usePoets() {
   });
 
   const filtered = useMemo(() => {
-    let result = ALL_POETS.filter((poet) => {
+    let result = allPoets.filter((poet) => {
       if (!matchesSearch(poet, filter.search)) return false;
       if (filter.century !== 'all' && poet.century !== filter.century) return false;
       if (filter.movement !== 'all' && poet.literaryMovement !== filter.movement) return false;
       return true;
     });
     return sortPoets(result, filter.sort);
-  }, [filter]);
+  }, [filter, allPoets]);
 
   /** Autocomplete suggestions based on current search query */
   const suggestions = useMemo(() => {
     if (!filter.search || filter.search.length < 2) return [];
     const term = filter.search.toLowerCase();
-    return ALL_POETS
+    return allPoets
       .filter(
         (p) =>
           p.fullName.toLowerCase().includes(term) ||
@@ -85,13 +139,13 @@ export function usePoets() {
       )
       .slice(0, 6)
       .map((p) => ({ slug: p.slug, label: p.fullName }));
-  }, [filter.search]);
+  }, [filter.search, allPoets]);
 
   return {
-    /** Filtered + sorted list — derived entirely from poets.json */
+    /** Filtered + sorted list — merged from poets.json + localStorage */
     poets: filtered,
-    /** Total number of poets in the JSON */
-    total: ALL_POETS.length,
+    /** Total number of poets (static + custom) */
+    total: allPoets.length,
     /** Current filter state */
     filter,
     /** Autocomplete suggestions */
@@ -106,13 +160,14 @@ export function usePoets() {
 }
 
 /**
- * Get a single poet by slug — reads directly from poets.json.
+ * Get a single poet by slug — checks both static JSON and localStorage.
  * Returns undefined if the slug doesn't exist.
  */
 export function usePoetBySlug(slug: string | undefined): Poet | undefined {
+  const allPoets = useAllPoets();
   return useMemo(
-    () => (slug ? ALL_POETS.find((p) => p.slug === slug) : undefined),
-    [slug],
+    () => (slug ? allPoets.find((p) => p.slug === slug) : undefined),
+    [slug, allPoets],
   );
 }
 
@@ -120,14 +175,15 @@ export function usePoetBySlug(slug: string | undefined): Poet | undefined {
  * Get related poets for a given poet (by relatedPoets slug array).
  */
 export function useRelatedPoets(slugs: string[]): Poet[] {
+  const allPoets = useAllPoets();
   return useMemo(
     () =>
       slugs
-        .map((s) => ALL_POETS.find((p) => p.slug === s))
+        .map((s) => allPoets.find((p) => p.slug === s))
         .filter((p): p is Poet => Boolean(p)),
-    [slugs],
+    [slugs, allPoets],
   );
 }
 
-/** Expose the raw list for use outside of components (e.g. stats). */
+/** Expose the static list for use outside of components (e.g. stats). */
 export { ALL_POETS };
