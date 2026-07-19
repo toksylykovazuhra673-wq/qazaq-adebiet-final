@@ -5,13 +5,20 @@ export interface BookCharacter {
   traits?: string[];
 }
 
+export interface TocEntry {
+  title: string;
+  paraIndex: number;
+  page?: number;
+  level?: number;   // 1 = chapter, 2 = section
+}
+
 export interface Book {
   id: number;
   slug: string;
   title: string;
   author: string;
   authorSlug?: string;
-  cover: string;           // gradient CSS or image path
+  cover: string;
   genre: string;
   year: string;
   description: string;
@@ -19,9 +26,9 @@ export interface Book {
   readingTimeMin: number;
   listeningTimeMin: number;
   views: number;
-  fullText: string[];      // paragraphs; empty if not public domain
-  pdf: string;             // filename under /pdf/ or ''
-  audio: string;           // filename under /audio/ or ''
+  fullText: string[];
+  pdf: string;
+  audio: string;
   characters: BookCharacter[];
   theme: string;
   idea: string;
@@ -31,8 +38,9 @@ export interface Book {
   video: string;
   tags: string[];
   isPublicDomain: boolean;
-  relatedWorks: string[];  // slugs
+  relatedWorks: string[];
   facts: string[];
+  tableOfContents?: TocEntry[];
 }
 
 // ─── Reader state ───────────────────────────────────────────
@@ -41,21 +49,32 @@ export type ReaderTab =
   | 'characters' | 'summary' | 'facts'
   | 'bookmarks' | 'notes';
 
-export type ReadingTheme = 'dark' | 'sepia' | 'light' | 'paper';
-export type RepeatMode  = 'none' | 'one' | 'all';
+export type ReadingTheme  = 'dark' | 'sepia' | 'light' | 'paper';
+export type RepeatMode    = 'none' | 'one' | 'all';
+export type HighlightColor = 'yellow' | 'green' | 'blue' | 'pink' | 'orange';
 
 export interface TextSettings {
-  fontSize: number;       // 14–26
-  lineHeight: number;     // 1.5 | 1.75 | 2.0 | 2.5
-  theme: ReadingTheme;
-  fontFamily: 'sans' | 'serif' | 'mono';
+  fontSize:    number;          // 14–28
+  lineHeight:  number;          // 1.5 | 1.75 | 2.0 | 2.5
+  theme:       ReadingTheme;
+  fontFamily:  'sans' | 'serif' | 'mono';
+  columnWidth: 'narrow' | 'medium' | 'wide';
 }
 
 export interface DrBookmark {
   id: string;
   type: 'text' | 'pdf' | 'audio';
   label: string;
-  value: number;          // scroll% | page | seconds
+  value: number;     // scroll% | page | seconds
+  note?: string;
+  createdAt: string;
+}
+
+export interface DrHighlight {
+  id: string;
+  paragraphIndex: number;
+  text: string;
+  color: HighlightColor;
   note?: string;
   createdAt: string;
 }
@@ -64,17 +83,19 @@ export interface DrNote {
   id: string;
   source: 'text' | 'pdf' | 'audio';
   content: string;
-  context?: string;       // quote/page/timestamp
+  context?: string;
   createdAt: string;
 }
 
 export interface DrPersist {
-  activeTab: ReaderTab;
-  textProgress: number;   // 0–100 scroll %
-  pdfPage: number;
-  audioTime: number;      // seconds
+  activeTab:    ReaderTab;
+  textProgress: number;
+  pdfPage:      number;
+  audioTime:    number;
   textSettings: TextSettings;
-  bookmarks: DrBookmark[];
-  notes: DrNote[];
-  isFavorite: boolean;
+  bookmarks:    DrBookmark[];
+  highlights:   DrHighlight[];
+  notes:        DrNote[];
+  isFavorite:   boolean;
+  nightMode:    boolean;
 }
