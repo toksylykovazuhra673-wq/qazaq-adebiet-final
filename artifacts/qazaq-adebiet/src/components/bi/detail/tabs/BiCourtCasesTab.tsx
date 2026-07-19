@@ -2,6 +2,7 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Scale, Users, CheckCircle2, Gavel } from 'lucide-react';
 import type { BiSheshen } from '@/types/bi';
+import TeacherPdfUploader from '@/components/bi/detail/TeacherPdfUploader';
 
 export default function BiCourtCasesTab({ bi }: { bi: BiSheshen }) {
   if (!bi.courtCases || bi.courtCases.length === 0) {
@@ -66,6 +67,9 @@ export default function BiCourtCasesTab({ bi }: { bi: BiSheshen }) {
           </div>
         </motion.div>
       ))}
+
+      {/* Teacher PDF uploader */}
+      <TeacherPdfUploader biSlug={bi.slug} category="dauly" />
     </div>
   );
 }

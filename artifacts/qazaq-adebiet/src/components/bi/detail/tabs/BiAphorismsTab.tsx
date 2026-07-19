@@ -14,6 +14,7 @@ import {
   quoteWordCount,
 } from '@/hooks/useQuotes';
 import QuoteDetailModal from '@/components/bi/detail/QuoteDetailModal';
+import TeacherPdfUploader from '@/components/bi/detail/TeacherPdfUploader';
 
 /* ─── Individual Quote Card ──────────────────────────────────────────────── */
 function QuoteCard({
@@ -368,6 +369,9 @@ export default function BiAphorismsTab({ bi }: { bi: BiSheshen }) {
         onToggleFavorite={toggleFavorite}
         onClose={() => setSelectedQuote(null)}
       />
+
+      {/* Teacher PDF uploader */}
+      <TeacherPdfUploader biSlug={bi.slug} category="nakyl" />
     </div>
   );
 }

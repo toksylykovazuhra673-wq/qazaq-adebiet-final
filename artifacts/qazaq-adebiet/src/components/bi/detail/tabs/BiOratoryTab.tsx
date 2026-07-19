@@ -8,6 +8,7 @@ import type { BiSheshen } from '@/types/bi';
 import { useOratoryBySlug, ORATORY_CATEGORIES, readingTime, wordCount } from '@/hooks/useOratory';
 import type { OratoryWord, OratoryCategory } from '@/hooks/useOratory';
 import OratoryReadModal from '../OratoryReadModal';
+import TeacherPdfUploader from '@/components/bi/detail/TeacherPdfUploader';
 
 const CATEGORY_COLORS: Record<string, string> = {
   'Арнау':       'bg-teal-500/15 border-teal-500/30 text-teal-400',
@@ -264,6 +265,9 @@ export default function BiOratoryTab({ bi }: { bi: BiSheshen }) {
         biName={bi.fullName}
         onClose={() => setSelectedWord(null)}
       />
+
+      {/* Teacher PDF uploader */}
+      <TeacherPdfUploader biSlug={bi.slug} category="oratory" />
     </div>
   );
 }
