@@ -1,0 +1,278 @@
+[
+  {
+    "id": "olen",
+    "slug": "olen",
+    "nameKk": "Өлең",
+    "nameRu": "Стихотворение",
+    "nameEn": "Lyric Poem",
+    "category": "Поэзия",
+    "description": "Ырғақты, ұйқасты жолдардан тұратын қысқа поэтикалық шығарма. Лирикалық «мен» арқылы сезімдер мен ойлар жеткізіледі.",
+    "characteristics": [
+      "Ырғақ пен ұйқас болады",
+      "Буын санауышы (7, 8, 11, 14 буын)",
+      "Шумақтарға бөлінеді",
+      "Лирикалық «мен» бар"
+    ],
+    "subgenres": [
+      { "id": "lirika", "name": "Лирикалық өлең", "description": "Сезім мен ой жырланады" },
+      { "id": "azamat", "name": "Азаматтық лирика", "description": "Ел мен ұлт тақырыбы" },
+      { "id": "tabigat", "name": "Табиғат лирикасы", "description": "Табиғат суреттеледі" },
+      { "id": "phylo", "name": "Философиялық лирика", "description": "Өмір мен өлім мәні" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "4–20",
+      "stanzaSize": "4 тармақ (шумақ)",
+      "meterRange": "7–14 буын",
+      "rhymeSchemes": ["ABAB", "AABB", "AAAA", "ABBA"]
+    },
+    "kazakhExamples": [
+      { "title": "Жазғытұры", "author": "Абай Қунанбайұлы", "year": "1887" },
+      { "title": "Сегіз аяқ", "author": "Абай Қунанбайұлы", "year": "1888" },
+      { "title": "Шолпан", "author": "Мағжан Жұмабаев", "year": "1912" }
+    ],
+    "analysisKeywords": ["жырлаймын", "шумақ", "ұйқас", "тармақ", "буын", "ән", "жыр", "сезім"],
+    "schoolGrades": ["5-сынып", "6-сынып", "7-сынып", "8-сынып", "9-сынып"],
+    "difficulty": "Орташа",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "poema",
+    "slug": "poema",
+    "nameKk": "Поэма",
+    "nameRu": "Поэма",
+    "nameEn": "Narrative Poem",
+    "category": "Поэзия",
+    "description": "Ірі поэтикалық туынды. Эпикалық оқиға немесе батырлық тақырыпты ырғақты жолдармен суреттейді.",
+    "characteristics": [
+      "Ұзын өлеңдік мәтін (30+ тармақ)",
+      "Оқиға мен кейіпкер бар",
+      "Эпикалық немесе лирикалық болады",
+      "Бөліктерге бөлінуі мүмкін"
+    ],
+    "subgenres": [
+      { "id": "batyrlyq", "name": "Батырлық поэма", "description": "Ерлік пен батырлық жырланады" },
+      { "id": "lirika-poema", "name": "Лирикалық поэма", "description": "Сезімдер жырланады" },
+      { "id": "tarihi", "name": "Тарихи поэма", "description": "Тарихи оқиғалар негізінде" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "50–500",
+      "stanzaSize": "4–8 тармақ",
+      "meterRange": "8–14 буын",
+      "rhymeSchemes": ["ABAB", "AABB", "AAAA"]
+    },
+    "kazakhExamples": [
+      { "title": "Батыр Баян", "author": "Мағжан Жұмабаев", "year": "1923" },
+      { "title": "Ескендір", "author": "Абай Қунанбайұлы", "year": "1887" },
+      { "title": "Кокшетау", "author": "Сәкен Сейфуллин", "year": "1926" }
+    ],
+    "analysisKeywords": ["поэма", "дастан", "жыр", "батыр", "ерлік", "жол", "сапар", "оқиға", "кейіпкер"],
+    "schoolGrades": ["9-сынып", "10-сынып"],
+    "difficulty": "Орташа",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "roman",
+    "slug": "roman",
+    "nameKk": "Роман",
+    "nameRu": "Роман",
+    "nameEn": "Novel",
+    "category": "Проза",
+    "description": "Ірі прозалық шығарма. Кейіпкерлердің өмірі мен психологиясын терең суреттейді.",
+    "characteristics": [
+      "Ірі прозалық форма (200+ бет)",
+      "Тармақталған сюжет",
+      "Көп кейіпкер",
+      "Психологиялық тереңдік",
+      "Тарауларға бөлінеді"
+    ],
+    "subgenres": [
+      { "id": "tarihi-roman", "name": "Тарихи роман", "description": "Тарихи оқиғалар мен тұлғалар" },
+      { "id": "lirika-roman", "name": "Лирикалық роман", "description": "Сүйіспеншілік тақырыбы" },
+      { "id": "psyhologik", "name": "Психологиялық роман", "description": "Кейіпкер психологиясы" },
+      { "id": "sotsialdyk", "name": "Әлеуметтік роман", "description": "Қоғамдық мәселелер" },
+      { "id": "epopeia", "name": "Роман-эпопея", "description": "Монументальды тарихи туынды" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "N/A",
+      "stanzaSize": "N/A",
+      "meterRange": "N/A",
+      "rhymeSchemes": []
+    },
+    "kazakhExamples": [
+      { "title": "Абай жолы", "author": "Мұхтар Әуезов", "year": "1942–1956" },
+      { "title": "Қан мен тер", "author": "Әбдіжәміл Нұрпейісов", "year": "1961–1970" },
+      { "title": "Бақытсыз Жамал", "author": "Міржақып Дулатов", "year": "1910" }
+    ],
+    "analysisKeywords": ["роман", "тарау", "бөлім", "кейіпкер", "сюжет", "оқиға", "суреттеу", "дамыту"],
+    "schoolGrades": ["10-сынып", "11-сынып"],
+    "difficulty": "Күрделі",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "angime",
+    "slug": "angime",
+    "nameKk": "Әңгіме",
+    "nameRu": "Рассказ",
+    "nameEn": "Short Story",
+    "category": "Проза",
+    "description": "Қысқа прозалық шығарма. Бір оқиға немесе бір кейіпкер айналасында өрбиді.",
+    "characteristics": [
+      "Қысқа проза (10–50 бет)",
+      "Бір оқиға немесе эпизод",
+      "Аз кейіпкер",
+      "Шоғырланған сюжет"
+    ],
+    "subgenres": [
+      { "id": "psyhologik-angime", "name": "Психологиялық әңгіме", "description": "Ішкі ой-сезім" },
+      { "id": "sotsialdyk-angime", "name": "Әлеуметтік әңгіме", "description": "Қоғамдық мәселелер" },
+      { "id": "humoristik", "name": "Юморлық әңгіме", "description": "Комедиялық сипат" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "N/A",
+      "stanzaSize": "N/A",
+      "meterRange": "N/A",
+      "rhymeSchemes": []
+    },
+    "kazakhExamples": [
+      { "title": "Қорғансыздың күні", "author": "Мұхтар Әуезов", "year": "1921" }
+    ],
+    "analysisKeywords": ["әңгіме", "хикая", "кейіпкер", "оқиға", "диалог", "эпизод"],
+    "schoolGrades": ["5-сынып", "6-сынып", "7-сынып", "8-сынып", "9-сынып"],
+    "difficulty": "Оңай",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "pyesa",
+    "slug": "pyesa",
+    "nameKk": "Пьеса",
+    "nameRu": "Пьеса",
+    "nameEn": "Play / Drama",
+    "category": "Драма",
+    "description": "Сахна үшін жазылған диалогты шығарма. Кейіпкерлер диалог арқылы ашылады.",
+    "characteristics": [
+      "Диалог арқылы оқиға өрбиді",
+      "Сахна нұсқаулары бар",
+      "Актілерге бөлінеді",
+      "Монолог пен диалог"
+    ],
+    "subgenres": [
+      { "id": "tragedia", "name": "Трагедия", "description": "Трагикалық аяқталу" },
+      { "id": "komedia", "name": "Комедия", "description": "Юморлық сипат" },
+      { "id": "drama", "name": "Драма", "description": "Психологиялық қайшылықтар" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "N/A",
+      "stanzaSize": "N/A",
+      "meterRange": "N/A",
+      "rhymeSchemes": []
+    },
+    "kazakhExamples": [
+      { "title": "Еңлік-Кебек", "author": "Мұхтар Әуезов", "year": "1917" },
+      { "title": "Хан Кене", "author": "Мұхтар Әуезов", "year": "1925" }
+    ],
+    "analysisKeywords": ["сахна", "рөл", "диалог", "монолог", "акт", "көрініс", "театр", "реплика"],
+    "schoolGrades": ["9-сынып", "10-сынып"],
+    "difficulty": "Орташа",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "esse",
+    "slug": "esse",
+    "nameKk": "Эссе",
+    "nameRu": "Эссе",
+    "nameEn": "Essay",
+    "category": "Проза",
+    "description": "Авторлық пікір мен ойды еркін түрде жеткізетін қысқа прозалық жанр.",
+    "characteristics": [
+      "Субъективтілік",
+      "Еркін форма",
+      "Авторлық «мен»",
+      "Философиялық ой"
+    ],
+    "subgenres": [
+      { "id": "phylo-esse", "name": "Философиялық эссе", "description": "Өмір мәні жайлы" },
+      { "id": "sehyeb-esse", "name": "Сыни эссе", "description": "Талдау мен сын" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "N/A",
+      "stanzaSize": "N/A",
+      "meterRange": "N/A",
+      "rhymeSchemes": []
+    },
+    "kazakhExamples": [
+      { "title": "Қара сөздер", "author": "Абай Қунанбайұлы", "year": "1890–1898" }
+    ],
+    "analysisKeywords": ["эссе", "ойым", "пікірімше", "менің ойымша", "сенімім", "деп ойлаймын"],
+    "schoolGrades": ["10-сынып", "11-сынып"],
+    "difficulty": "Орташа",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "jyr",
+    "slug": "jyr",
+    "nameKk": "Жыр / Толғау",
+    "nameRu": "Жыр / Толгау",
+    "nameEn": "Epic Oral Poetry",
+    "category": "Поэзия",
+    "description": "Ауызша дәстүрдегі эпикалық немесе философиялық жыр. Жыраулар айтатын ірі поэтикалық форма.",
+    "characteristics": [
+      "Ауызша орындалады",
+      "Домбырамен жырланады",
+      "Ұзын сарынды жолдар",
+      "Дидактикалық сипат"
+    ],
+    "subgenres": [
+      { "id": "epikalyq", "name": "Эпикалық жыр", "description": "Батырлар туралы" },
+      { "id": "tolgau", "name": "Толғау", "description": "Философиялық монолог" },
+      { "id": "aitysh", "name": "Айтыс", "description": "Екі ақынның жырлық жарысы" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "50–1000+",
+      "stanzaSize": "2–8 тармақ",
+      "meterRange": "7–11 буын",
+      "rhymeSchemes": ["AAAA", "ABAB"]
+    },
+    "kazakhExamples": [
+      { "title": "Ленинградтық өренім", "author": "Жамбыл Жабаев", "year": "1941" },
+      { "title": "Күй", "author": "Ілияс Жансүгіров", "year": "1934" }
+    ],
+    "analysisKeywords": ["жырау", "толғау", "жырлады", "айтты", "ақын", "домбыра", "батыр", "хан"],
+    "schoolGrades": ["7-сынып", "8-сынып", "9-сынып"],
+    "difficulty": "Орташа",
+    "addedDate": "2024-01-01"
+  },
+  {
+    "id": "ertegi",
+    "slug": "ertegi",
+    "nameKk": "Ертегі",
+    "nameRu": "Сказка",
+    "nameEn": "Fairy Tale",
+    "category": "Ауыз әдебиеті",
+    "description": "Фантастикалық оқиғалары бар халықтық прозалық шығарма. Жақсылық пен жамандықтың күресі.",
+    "characteristics": [
+      "Тұрақты басталу (Ертеде, бір болды...)",
+      "Сиқырлы кейіпкерлер",
+      "Жақсылықтың жеңісімен аяқталады",
+      "Дидактикалық сипат"
+    ],
+    "subgenres": [
+      { "id": "sihyrly", "name": "Сиқырлы ертегі", "description": "Тылсым мен сиқыр" },
+      { "id": "haywandar", "name": "Аңдар туралы ертегі", "description": "Жануарлар кейіпкер" },
+      { "id": "turmystyq", "name": "Тұрмыстық ертегі", "description": "Күнделікті өмір" }
+    ],
+    "structuralFeatures": {
+      "avgLineCount": "N/A",
+      "stanzaSize": "N/A",
+      "meterRange": "N/A",
+      "rhymeSchemes": []
+    },
+    "kazakhExamples": [
+      { "title": "Ер Тарғын", "author": "Халық ауыз әдебиеті", "year": "XV–XVII ғ." },
+      { "title": "Алтын қыз", "author": "Халық ауыз әдебиеті", "year": "Белгісіз" }
+    ],
+    "analysisKeywords": ["ертегі", "бір болды", "хан болды", "бірде", "сонда", "перізат", "самұрық", "алтын"],
+    "schoolGrades": ["1-сынып", "2-сынып", "3-сынып", "4-сынып"],
+    "difficulty": "Оңай",
+    "addedDate": "2024-01-01"
+  }
+]

@@ -2,8 +2,7 @@ import React, { useState } from 'react';
 import { useLocation, Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { Search, SlidersHorizontal, BookOpen } from 'lucide-react';
-import authorsData from '@/data/authors.json';
-import { Author } from '@/types';
+import { getCompatAuthors } from '@/lib/dataLoader';
 
 export default function CategoryListPage() {
   const [location] = useLocation();
@@ -15,7 +14,7 @@ export default function CategoryListPage() {
   
   let pageTitle = '';
   let pageDesc = '';
-  let filteredAuthors = authorsData as Author[];
+  let filteredAuthors = getCompatAuthors();
 
   if (routeCategory === 'aqyndar') {
     pageTitle = 'Ақындар';

@@ -4,7 +4,7 @@ import type {
 } from '@/types/book';
 import booksData from '@/data/books.json';
 
-const books = booksData as Book[];
+const books = booksData as unknown as Book[];
 
 const DEFAULT_TEXT_SETTINGS: TextSettings = {
   fontSize:   18,

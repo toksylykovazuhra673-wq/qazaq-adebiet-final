@@ -2,11 +2,10 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'wouter';
 import { ArrowRight } from 'lucide-react';
-import authorsData from '@/data/authors.json';
-import { Author } from '@/types';
+import { getFeaturedAuthors } from '@/lib/dataLoader';
 
 export default function FeaturedAuthorsSection() {
-  const featuredAuthors = (authorsData as Author[]).filter(a => a.popular).slice(0, 6);
+  const featuredAuthors = getFeaturedAuthors(6);
 
   return (
     <section className="py-20 relative">

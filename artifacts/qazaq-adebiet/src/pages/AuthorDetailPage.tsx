@@ -2,15 +2,17 @@ import React from 'react';
 import { useParams, Link } from 'wouter';
 import { motion } from 'framer-motion';
 import { ArrowLeft, BookOpen, MapPin, Calendar, LayoutGrid } from 'lucide-react';
-import authorsData from '@/data/authors.json';
+import { getAuthorBySlug } from '@/lib/dataLoader';
 import worksData from '@/data/works.json';
-import { Author, Work } from '@/types';
+import { Work } from '@/types';
 
 export default function AuthorDetailPage() {
   const { slug } = useParams();
   
-  const author = (authorsData as Author[]).find(a => a.slug === slug);
-  const authorWorks = (worksData as Work[]).filter(w => w.authorId === author?.id);
+  const author = getAuthorBySlug(slug ?? '');
+  const authorWorks = (worksData as Work[]).filter(
+    (w) => w.authorName === author?.fullName || w.authorName === author?.name
+  );
 
   if (!author) {
     return (
