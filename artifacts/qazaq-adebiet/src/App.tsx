@@ -1,3 +1,4 @@
+import { lazy, Suspense, memo } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from '@/components/ui/toaster';
 import { TooltipProvider } from '@/components/ui/tooltip';
@@ -5,179 +6,220 @@ import { Route, Switch, Router as WouterRouter } from 'wouter';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
+import {
+  RouteFallback, GridPageSkeleton, DashboardPageSkeleton, ReaderPageSkeleton,
+} from '@/components/PageSkeleton';
 
-// Pages
-import HomePage from '@/pages/HomePage';
-import PoetsPage from '@/pages/poets/PoetsPage';
-import PoetDetailPage from '@/pages/poets/PoetDetailPage';
-import WritersPage from '@/pages/writers/WritersPage';
-import WriterDetailPage from '@/pages/writers/WriterDetailPage';
-import ZhyrauPage from '@/pages/zhyrau/ZhyrauPage';
-import ZhyrauDetailPage from '@/pages/zhyrau/ZhyrauDetailPage';
-import BiPage from '@/pages/bi/BiPage';
-import BiDetailPage from '@/pages/bi/BiDetailPage';
-import EducatorPage from '@/pages/educator/EducatorPage';
-import EducatorDetailPage from '@/pages/educator/EducatorDetailPage';
-import UniversalAuthorPage from '@/pages/universal/UniversalAuthorPage';
-import WorkDetailPage from '@/pages/universal/WorkDetailPage';
-import PdfReaderPage      from '@/pages/reader/PdfReaderPage';
-import PdfLibraryPage     from '@/pages/reader/PdfLibraryPage';
-import DigitalReaderPage  from '@/pages/reader/DigitalReaderPage';
-import WorkPdfReaderPage  from '@/pages/reader/WorkPdfReaderPage';
-import AnalysisPage       from '@/pages/analysis/AnalysisPage';
-import FreeAnalysisPage   from '@/pages/analysis/FreeAnalysisPage';
-import InteractivePage    from '@/pages/interactive/InteractivePage';
-import AuthorDetailPage from '@/pages/AuthorDetailPage';
-import StudentCabinetPage    from '@/pages/cabinet/StudentCabinetPage';
-import TeacherDashboardPage from '@/pages/teacher/TeacherDashboardPage';
-import NotFound from '@/pages/not-found';
+// ── Lazy page imports (code splitting) ───────────────────────────────────────
+// Core — eager (tiny, needed immediately)
+import HomePage   from '@/pages/HomePage';
+import NotFound   from '@/pages/not-found';
 
-const queryClient = new QueryClient();
+// Literature section
+const PoetsPage         = lazy(() => import('@/pages/poets/PoetsPage'));
+const PoetDetailPage    = lazy(() => import('@/pages/poets/PoetDetailPage'));
+const WritersPage       = lazy(() => import('@/pages/writers/WritersPage'));
+const WriterDetailPage  = lazy(() => import('@/pages/writers/WriterDetailPage'));
+const ZhyrauPage        = lazy(() => import('@/pages/zhyrau/ZhyrauPage'));
+const ZhyrauDetailPage  = lazy(() => import('@/pages/zhyrau/ZhyrauDetailPage'));
+const BiPage            = lazy(() => import('@/pages/bi/BiPage'));
+const BiDetailPage      = lazy(() => import('@/pages/bi/BiDetailPage'));
+const EducatorPage      = lazy(() => import('@/pages/educator/EducatorPage'));
+const EducatorDetailPage= lazy(() => import('@/pages/educator/EducatorDetailPage'));
+const UniversalAuthorPage = lazy(() => import('@/pages/universal/UniversalAuthorPage'));
+const WorkDetailPage    = lazy(() => import('@/pages/universal/WorkDetailPage'));
+const AuthorDetailPage  = lazy(() => import('@/pages/AuthorDetailPage'));
 
-// Main App Layout Wrapper to ensure Header and Footer are present on all pages
-// unless it's just the HomePage which already imports them.
-// Wait, the HomePage already includes Header and Footer.
-// For consistency, let's wrap all pages EXCEPT HomePage in a layout, OR we remove Header/Footer from HomePage and put them here.
-// The instructions say "HomePage assembles all home sections in order... Footer".
-// But we want Header and Footer on other pages too.
-// Let's create a Shell component.
-function AppShell({ children }: { children: React.ReactNode }) {
+// Reader section (heavy — own chunk)
+const PdfLibraryPage    = lazy(() => import('@/pages/reader/PdfLibraryPage'));
+const PdfReaderPage     = lazy(() => import('@/pages/reader/PdfReaderPage'));
+const DigitalReaderPage = lazy(() => import('@/pages/reader/DigitalReaderPage'));
+const WorkPdfReaderPage = lazy(() => import('@/pages/reader/WorkPdfReaderPage'));
+
+// Analysis (own chunk)
+const AnalysisPage      = lazy(() => import('@/pages/analysis/AnalysisPage'));
+const FreeAnalysisPage  = lazy(() => import('@/pages/analysis/FreeAnalysisPage'));
+
+// Interactive / Games (own chunk)
+const InteractivePage   = lazy(() => import('@/pages/interactive/InteractivePage'));
+
+// User modules (own chunk)
+const StudentCabinetPage   = lazy(() => import('@/pages/cabinet/StudentCabinetPage'));
+const TeacherDashboardPage = lazy(() => import('@/pages/teacher/TeacherDashboardPage'));
+
+// ── QueryClient (with performance-tuned defaults) ────────────────────────────
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime:       5  * 60 * 1000,  // 5 min
+      gcTime:          15 * 60 * 1000,  // 15 min
+      retry:           1,
+      refetchOnWindowFocus: false,
+    },
+  },
+});
+
+// ── Layout shell ─────────────────────────────────────────────────────────────
+const AppShell = memo(function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
-      <main className="flex-1">
-        {children}
-      </main>
+      <main className="flex-1">{children}</main>
       <Footer />
     </div>
   );
+});
+
+// ── Suspense wrappers ─────────────────────────────────────────────────────────
+function Page({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<RouteFallback />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+function GridPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<GridPageSkeleton />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+function ReaderPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<ReaderPageSkeleton />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
+}
+function DashPage({ children }: { children: React.ReactNode }) {
+  return (
+    <ErrorBoundary>
+      <Suspense fallback={<DashboardPageSkeleton />}>{children}</Suspense>
+    </ErrorBoundary>
+  );
 }
 
+// ── Router ────────────────────────────────────────────────────────────────────
 function Router() {
   return (
     <Switch>
-      {/* HomePage defines its own Header/Footer according to instructions, 
-          but actually it's better to just render HomePage. */}
+      {/* HomePage — eager */}
       <Route path="/" component={HomePage} />
-      
-      {/* Other routes wrapped in AppShell */}
-      {/* Legacy URL aliases → canonical pages */}
+
+      {/* ── Legacy URL aliases ─────────────────────────────────────────── */}
       <Route path="/aqyndar">
-        {() => <AppShell><PoetsPage /></AppShell>}
+        {() => <GridPage><AppShell><PoetsPage /></AppShell></GridPage>}
       </Route>
       <Route path="/zhazushylar">
-        {() => <AppShell><WritersPage /></AppShell>}
+        {() => <GridPage><AppShell><WritersPage /></AppShell></GridPage>}
       </Route>
       <Route path="/zhyraudar">
-        {() => <AppShell><ZhyrauPage /></AppShell>}
+        {() => <GridPage><AppShell><ZhyrauPage /></AppShell></GridPage>}
       </Route>
       <Route path="/kitapkhana">
-        {() => <AppShell><PdfLibraryPage /></AppShell>}
+        {() => <GridPage><AppShell><PdfLibraryPage /></AppShell></GridPage>}
       </Route>
       <Route path="/taldau">
-        {() => <AppShell><FreeAnalysisPage /></AppShell>}
+        {() => <Page><AppShell><FreeAnalysisPage /></AppShell></Page>}
       </Route>
       <Route path="/oyyndar">
-        {() => <InteractivePage />}
+        {() => <Page><InteractivePage /></Page>}
       </Route>
       <Route path="/olimpiada">
-        {() => <InteractivePage />}
+        {() => <Page><InteractivePage /></Page>}
       </Route>
-      
+
+      {/* ── Poets ──────────────────────────────────────────────────────── */}
       <Route path="/poets">
-        {() => <AppShell><PoetsPage /></AppShell>}
+        {() => <GridPage><AppShell><PoetsPage /></AppShell></GridPage>}
       </Route>
       <Route path="/poets/:slug">
-        {() => <AppShell><PoetDetailPage /></AppShell>}
+        {() => <Page><AppShell><PoetDetailPage /></AppShell></Page>}
       </Route>
 
+      {/* ── Writers ────────────────────────────────────────────────────── */}
       <Route path="/writers">
-        {() => <AppShell><WritersPage /></AppShell>}
+        {() => <GridPage><AppShell><WritersPage /></AppShell></GridPage>}
       </Route>
       <Route path="/writers/:slug">
-        {() => <AppShell><WriterDetailPage /></AppShell>}
+        {() => <Page><AppShell><WriterDetailPage /></AppShell></Page>}
       </Route>
 
+      {/* ── Bi-sheshender ──────────────────────────────────────────────── */}
       <Route path="/bi-sheshender">
-        {() => <AppShell><BiPage /></AppShell>}
+        {() => <GridPage><AppShell><BiPage /></AppShell></GridPage>}
       </Route>
       <Route path="/bi-sheshender/:slug">
-        {() => <AppShell><BiDetailPage /></AppShell>}
+        {() => <Page><AppShell><BiDetailPage /></AppShell></Page>}
       </Route>
 
+      {/* ── Educators ──────────────────────────────────────────────────── */}
       <Route path="/educators">
-        {() => <AppShell><EducatorPage /></AppShell>}
+        {() => <GridPage><AppShell><EducatorPage /></AppShell></GridPage>}
       </Route>
       <Route path="/educators/:slug">
-        {() => <AppShell><EducatorDetailPage /></AppShell>}
+        {() => <Page><AppShell><EducatorDetailPage /></AppShell></Page>}
       </Route>
 
+      {/* ── Zhyrau ─────────────────────────────────────────────────────── */}
       <Route path="/zhyrau">
-        {() => <AppShell><ZhyrauPage /></AppShell>}
+        {() => <GridPage><AppShell><ZhyrauPage /></AppShell></GridPage>}
       </Route>
       <Route path="/zhyrau/:slug">
-        {() => <AppShell><ZhyrauDetailPage /></AppShell>}
+        {() => <Page><AppShell><ZhyrauDetailPage /></AppShell></Page>}
       </Route>
 
+      {/* ── Authors ────────────────────────────────────────────────────── */}
       <Route path="/author/:slug">
-        {() => <AppShell><AuthorDetailPage /></AppShell>}
+        {() => <Page><AppShell><AuthorDetailPage /></AppShell></Page>}
       </Route>
-
-      {/* Universal Author Page — /authors/:category/:slug */}
       <Route path="/authors/:category/:slug">
-        {() => <AppShell><UniversalAuthorPage /></AppShell>}
+        {() => <Page><AppShell><UniversalAuthorPage /></AppShell></Page>}
       </Route>
 
-      {/* Work Detail Page — /works/:slug */}
+      {/* ── Works ──────────────────────────────────────────────────────── */}
       <Route path="/works/:slug">
-        {() => <AppShell><WorkDetailPage /></AppShell>}
+        {() => <Page><AppShell><WorkDetailPage /></AppShell></Page>}
       </Route>
 
-      {/* PDF Library — /reader */}
+      {/* ── Reader ─────────────────────────────────────────────────────── */}
       <Route path="/reader">
-        {() => <AppShell><PdfLibraryPage /></AppShell>}
+        {() => <GridPage><AppShell><PdfLibraryPage /></AppShell></GridPage>}
       </Route>
-
-      {/* Professional PDF Reader — /reader/pdf/:slug (no AppShell — full screen reader) */}
       <Route path="/reader/pdf/:slug">
-        {() => <PdfReaderPage />}
+        {() => <ReaderPage><PdfReaderPage /></ReaderPage>}
       </Route>
-
-      {/* Digital Reading System — /reader/:slug (no AppShell — immersive reader) */}
       <Route path="/reader/:slug">
-        {() => <DigitalReaderPage />}
+        {() => <ReaderPage><DigitalReaderPage /></ReaderPage>}
       </Route>
-
-      {/* Uploaded-PDF full-page reader — /shygarma/:ownerSlug/:itemId */}
       <Route path="/shygarma/:ownerSlug/:itemId">
-        {() => <WorkPdfReaderPage />}
+        {() => <ReaderPage><WorkPdfReaderPage /></ReaderPage>}
       </Route>
 
-      {/* Free text poem analyzer — /analysis (no workSlug) */}
+      {/* ── Analysis ───────────────────────────────────────────────────── */}
       <Route path="/analysis">
-        {() => <AppShell><FreeAnalysisPage /></AppShell>}
+        {() => <Page><AppShell><FreeAnalysisPage /></AppShell></Page>}
       </Route>
-
-      {/* Automatic Literary Analysis — /analysis/:workSlug (no AppShell — full screen) */}
       <Route path="/analysis/:workSlug">
-        {() => <AnalysisPage />}
+        {() => <Page><AnalysisPage /></Page>}
       </Route>
 
-      {/* Interactive Learning Lab — /interactive */}
+      {/* ── Interactive ────────────────────────────────────────────────── */}
       <Route path="/interactive">
-        {() => <InteractivePage />}
+        {() => <Page><InteractivePage /></Page>}
       </Route>
 
-      {/* Student Cabinet — /cabinet */}
+      {/* ── User modules ───────────────────────────────────────────────── */}
       <Route path="/cabinet">
-        {() => <StudentCabinetPage />}
+        {() => <DashPage><StudentCabinetPage /></DashPage>}
       </Route>
-
-      {/* Teacher Dashboard — /mugalim */}
       <Route path="/mugalim">
-        {() => <TeacherDashboardPage />}
+        {() => <DashPage><TeacherDashboardPage /></DashPage>}
       </Route>
 
+      {/* ── 404 ────────────────────────────────────────────────────────── */}
       <Route>
         {() => <AppShell><NotFound /></AppShell>}
       </Route>
@@ -185,12 +227,15 @@ function Router() {
   );
 }
 
+// ── App root ──────────────────────────────────────────────────────────────────
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <WouterRouter base={import.meta.env.BASE_URL.replace(/\/$/, '')}>
-          <Router />
+          <ErrorBoundary>
+            <Router />
+          </ErrorBoundary>
         </WouterRouter>
         <Toaster />
       </TooltipProvider>

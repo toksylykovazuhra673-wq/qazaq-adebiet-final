@@ -1,3 +1,6 @@
 - [books-json-fieldnames](books-json-fieldnames.md) — books.json uses authorName/pdfAvailable/audioAvailable/viewCount/id (not author/pdf/audio/views/slug); always cast defensively.
 - [student-cabinet](student-cabinet.md) — Full student cabinet at /cabinet; 6-tab layout with sidebar+bottom-nav; data from useProgress (ill_progress) + dr_${slug} localStorage keys.
 - [digital-reader-null-guards](digital-reader-null-guards.md) — book.fullText/readingTimeMin/views are undefined in books.json; use ?? [] and ?? 0 guards throughout TextReaderTab and DRHeader.
+- [teacher-dashboard](teacher-dashboard.md) — Teacher dashboard at /mugalim; 7-tab; localStorage key teacher_data; hooks/useTeacherDashboard.ts; CSS via teacher.css with @reference.
+- [theme-system](theme-system.md) — Light/dark toggle via ThemeProvider (qa-theme localStorage key); dark class on <html>; cabinet+teacher pages force dark with className="dark ..."; body bg uses CSS vars.
+- [production-infra](production-infra.md) — ErrorBoundary, PageSkeleton, LazyImage components; App.tsx uses React.lazy+Suspense for all routes except HomePage+NotFound; QueryClient has 5min staleTime.

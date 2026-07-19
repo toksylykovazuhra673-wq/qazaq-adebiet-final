@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Search, Menu, X, GraduationCap } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { ThemeToggle } from '@/components/ThemeProvider';
 
 const NAV_LINKS = [
   { href: '/poets',       label: 'Ақындар' },
@@ -111,6 +112,9 @@ export default function Header() {
                 </button>
               </div>
 
+              {/* Theme toggle */}
+              <ThemeToggle />
+
               {/* Mobile Menu Toggle */}
               <button
                 className="lg:hidden p-2 text-foreground/80 hover:text-primary transition-colors"
@@ -132,7 +136,7 @@ export default function Header() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-40 bg-[#0a0618]/95 backdrop-blur-xl flex flex-col pt-24 px-6 pb-6 lg:hidden"
+            className="fixed inset-0 z-40 bg-background/95 backdrop-blur-xl flex flex-col pt-24 px-6 pb-6 lg:hidden"
           >
             <nav className="flex flex-col gap-6">
               {NAV_LINKS.map((link) => (
@@ -148,9 +152,21 @@ export default function Header() {
                 </Link>
               ))}
             </nav>
+            <div className="mt-6 flex flex-col gap-3">
+              <Link href="/cabinet" onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-violet-500/10
+                  border border-violet-500/20 text-violet-400 font-medium">
+                <GraduationCap size={16} /> Оқушы кабинеті
+              </Link>
+              <Link href="/mugalim" onClick={() => setIsMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-4 py-3 rounded-2xl bg-emerald-500/10
+                  border border-emerald-500/20 text-emerald-400 font-medium">
+                <GraduationCap size={16} /> Мұғалім кабинеті
+              </Link>
+            </div>
             <div className="mt-auto">
               <div className="glass-panel p-4 rounded-xl">
-                <p className="text-sm text-white/50 text-center">
+                <p className="text-sm text-muted-foreground text-center">
                   Қазақ Әдебиеті Порталы © 2025
                 </p>
               </div>

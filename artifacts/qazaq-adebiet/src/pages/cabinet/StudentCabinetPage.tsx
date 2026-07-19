@@ -113,7 +113,7 @@ export default function StudentCabinetPage() {
   const activeTabMeta = TABS.find(t => t.id === activeTab) ?? TABS[0];
 
   return (
-    <div className="min-h-screen bg-gray-950 text-white flex flex-col">
+    <div className="dark min-h-screen bg-gray-950 text-white flex flex-col">
       {/* Top bar */}
       <header className="sticky top-0 z-30 bg-gray-950/90 backdrop-blur-xl border-b border-white/6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
