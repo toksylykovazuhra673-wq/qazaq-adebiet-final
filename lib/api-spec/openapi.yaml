@@ -1,22 +1,39 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Kazakh Language LMS API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: courses
+    description: Course management
+  - name: lessons
+    description: Lesson management
+  - name: exercises
+    description: Exercise management
+  - name: progress
+    description: User progress tracking
+  - name: vocabulary
+    description: Vocabulary management
+  - name: grammar
+    description: Grammar rules
+  - name: dashboard
+    description: Dashboard & stats
+  - name: achievements
+    description: Achievements & gamification
+  - name: users
+    description: User management
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +41,501 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  # ── Courses ────────────────────────────────────────────────────────────────
+  /courses:
+    get:
+      operationId: listCourses
+      tags: [courses]
+      summary: List all courses
+      parameters:
+        - in: query
+          name: level
+          schema:
+            type: string
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+    post:
+      operationId: createCourse
+      tags: [courses]
+      summary: Create a course
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CourseInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+
+  /courses/featured:
+    get:
+      operationId: listFeaturedCourses
+      tags: [courses]
+      summary: Get featured courses for the home screen
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+
+  /courses/by-level:
+    get:
+      operationId: listCoursesByLevel
+      tags: [courses]
+      summary: Courses grouped by education level
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CourseLevel"
+
+  /courses/{courseId}:
+    get:
+      operationId: getCourse
+      tags: [courses]
+      summary: Get course details
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Course"
+        "404":
+          description: Not found
+
+  /courses/{courseId}/lessons:
+    get:
+      operationId: listCourseLessons
+      tags: [lessons]
+      summary: List lessons for a course
+      parameters:
+        - in: path
+          name: courseId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Lesson"
+
+  # ── Lessons ────────────────────────────────────────────────────────────────
+  /lessons:
+    post:
+      operationId: createLesson
+      tags: [lessons]
+      summary: Create a lesson
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LessonInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Lesson"
+
+  /lessons/{lessonId}:
+    get:
+      operationId: getLesson
+      tags: [lessons]
+      summary: Get lesson with exercises
+      parameters:
+        - in: path
+          name: lessonId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LessonDetail"
+        "404":
+          description: Not found
+
+  # ── Exercises ──────────────────────────────────────────────────────────────
+  /exercises/{exerciseId}/submit:
+    post:
+      operationId: submitExercise
+      tags: [exercises]
+      summary: Submit an exercise answer
+      parameters:
+        - in: path
+          name: exerciseId
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ExerciseSubmission"
+      responses:
+        "200":
+          description: Result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ExerciseResult"
+
+  # ── Progress ───────────────────────────────────────────────────────────────
+  /progress:
+    get:
+      operationId: listProgress
+      tags: [progress]
+      summary: Get current user's progress
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProgress"
+    post:
+      operationId: saveProgress
+      tags: [progress]
+      summary: Save lesson progress
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProgressInput"
+      responses:
+        "201":
+          description: Saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProgress"
+
+  /progress/streak:
+    get:
+      operationId: getStreak
+      tags: [progress]
+      summary: Get current user's learning streak and XP
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StreakInfo"
+
+  # ── Vocabulary ─────────────────────────────────────────────────────────────
+  /vocabulary:
+    get:
+      operationId: listVocabulary
+      tags: [vocabulary]
+      summary: List vocabulary words
+      parameters:
+        - in: query
+          name: category
+          schema:
+            type: string
+        - in: query
+          name: level
+          schema:
+            type: string
+        - in: query
+          name: search
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VocabWord"
+    post:
+      operationId: createVocabWord
+      tags: [vocabulary]
+      summary: Add a vocabulary word
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VocabWordInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/VocabWord"
+
+  /vocabulary/categories:
+    get:
+      operationId: listVocabCategories
+      tags: [vocabulary]
+      summary: List vocabulary categories with counts
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/VocabCategory"
+
+  # ── Grammar ────────────────────────────────────────────────────────────────
+  /grammar:
+    get:
+      operationId: listGrammarRules
+      tags: [grammar]
+      summary: List grammar rules
+      parameters:
+        - in: query
+          name: level
+          schema:
+            type: string
+        - in: query
+          name: topic
+          schema:
+            type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GrammarRule"
+    post:
+      operationId: createGrammarRule
+      tags: [grammar]
+      summary: Create a grammar rule
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GrammarRuleInput"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrammarRule"
+
+  /grammar/{ruleId}:
+    get:
+      operationId: getGrammarRule
+      tags: [grammar]
+      summary: Get grammar rule detail with examples
+      parameters:
+        - in: path
+          name: ruleId
+          required: true
+          schema:
+            type: integer
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GrammarRule"
+
+  # ── Dashboard ──────────────────────────────────────────────────────────────
+  /dashboard/summary:
+    get:
+      operationId: getDashboardSummary
+      tags: [dashboard]
+      summary: User dashboard summary — XP, streak, completed lessons, level
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DashboardSummary"
+
+  /dashboard/recommended:
+    get:
+      operationId: getRecommendedCourses
+      tags: [dashboard]
+      summary: Recommended courses for the current user
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Course"
+
+  /dashboard/activity:
+    get:
+      operationId: getRecentActivity
+      tags: [dashboard]
+      summary: Recent learning activity feed
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ActivityItem"
+
+  /dashboard/platform-stats:
+    get:
+      operationId: getPlatformStats
+      tags: [dashboard]
+      summary: Platform-wide statistics
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PlatformStats"
+
+  # ── Achievements ───────────────────────────────────────────────────────────
+  /achievements:
+    get:
+      operationId: listAchievements
+      tags: [achievements]
+      summary: List all achievements
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Achievement"
+
+  /achievements/user:
+    get:
+      operationId: listUserAchievements
+      tags: [achievements]
+      summary: Get current user's earned achievements
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserAchievement"
+
+  # ── Leaderboard ────────────────────────────────────────────────────────────
+  /leaderboard:
+    get:
+      operationId: getLeaderboard
+      tags: [users]
+      summary: Top learners leaderboard
+      parameters:
+        - in: query
+          name: period
+          schema:
+            type: string
+            enum: [week, month, all]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/LeaderboardEntry"
+
+  # ── Users ──────────────────────────────────────────────────────────────────
+  /users/profile:
+    get:
+      operationId: getUserProfile
+      tags: [users]
+      summary: Get current user profile
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+    patch:
+      operationId: updateUserProfile
+      tags: [users]
+      summary: Update current user profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UserProfileUpdate"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
 components:
   schemas:
     HealthStatus:
@@ -31,6 +543,314 @@ components:
       properties:
         status:
           type: string
-      required:
-        - status
+      required: [status]
 
+    # ── Course ───────────────────────────────────────────────────────────────
+    Course:
+      type: object
+      required: [id, title, description, level, category, lessonCount, duration, difficulty, xpReward, coverColor]
+      properties:
+        id:           { type: integer }
+        title:        { type: string }
+        description:  { type: string }
+        level:        { type: string }
+        category:     { type: string }
+        lessonCount:  { type: integer }
+        duration:     { type: integer, description: "Minutes" }
+        difficulty:   { type: string, enum: [beginner, intermediate, advanced] }
+        xpReward:     { type: integer }
+        coverColor:   { type: string }
+        coverIcon:    { type: ["string", "null"] }
+        completedLessons: { type: ["integer", "null"] }
+        isEnrolled:   { type: ["boolean", "null"] }
+
+    CourseInput:
+      type: object
+      required: [title, description, level, category, difficulty, xpReward, coverColor]
+      properties:
+        title:       { type: string }
+        description: { type: string }
+        level:       { type: string }
+        category:    { type: string }
+        difficulty:  { type: string, enum: [beginner, intermediate, advanced] }
+        xpReward:    { type: integer }
+        coverColor:  { type: string }
+        coverIcon:   { type: string }
+
+    CourseLevel:
+      type: object
+      required: [level, label, courses]
+      properties:
+        level:    { type: string }
+        label:    { type: string }
+        courses:
+          type: array
+          items:
+            $ref: "#/components/schemas/Course"
+
+    # ── Lesson ────────────────────────────────────────────────────────────────
+    Lesson:
+      type: object
+      required: [id, courseId, title, type, order, duration, xpReward, isCompleted]
+      properties:
+        id:          { type: integer }
+        courseId:    { type: integer }
+        title:       { type: string }
+        type:        { type: string, enum: [theory, practice, test, vocabulary, listening] }
+        order:       { type: integer }
+        duration:    { type: integer }
+        xpReward:    { type: integer }
+        isCompleted: { type: boolean }
+        isLocked:    { type: ["boolean", "null"] }
+
+    LessonDetail:
+      type: object
+      required: [id, courseId, title, type, order, duration, xpReward, isCompleted, content, exercises]
+      properties:
+        id:          { type: integer }
+        courseId:    { type: integer }
+        title:       { type: string }
+        type:        { type: string, enum: [theory, practice, test, vocabulary, listening] }
+        order:       { type: integer }
+        duration:    { type: integer }
+        xpReward:    { type: integer }
+        isCompleted: { type: boolean }
+        content:     { type: string }
+        exercises:
+          type: array
+          items:
+            $ref: "#/components/schemas/Exercise"
+
+    LessonInput:
+      type: object
+      required: [courseId, title, type, order, duration, xpReward, content]
+      properties:
+        courseId:  { type: integer }
+        title:     { type: string }
+        type:      { type: string, enum: [theory, practice, test, vocabulary, listening] }
+        order:     { type: integer }
+        duration:  { type: integer }
+        xpReward:  { type: integer }
+        content:   { type: string }
+
+    # ── Exercise ──────────────────────────────────────────────────────────────
+    Exercise:
+      type: object
+      required: [id, lessonId, type, question, order]
+      properties:
+        id:          { type: integer }
+        lessonId:    { type: integer }
+        type:        { type: string, enum: [multiple_choice, fill_blank, match, translate, audio] }
+        question:    { type: string }
+        options:     { type: ["array", "null"], items: { type: string } }
+        order:       { type: integer }
+        explanation: { type: ["string", "null"] }
+
+    ExerciseSubmission:
+      type: object
+      required: [answer]
+      properties:
+        answer: { type: string }
+
+    ExerciseResult:
+      type: object
+      required: [correct, correctAnswer, xpEarned]
+      properties:
+        correct:       { type: boolean }
+        correctAnswer: { type: string }
+        explanation:   { type: ["string", "null"] }
+        xpEarned:      { type: integer }
+
+    # ── Progress ──────────────────────────────────────────────────────────────
+    UserProgress:
+      type: object
+      required: [id, lessonId, completed, score, completedAt]
+      properties:
+        id:          { type: integer }
+        lessonId:    { type: integer }
+        completed:   { type: boolean }
+        score:       { type: integer }
+        completedAt: { type: string, format: date-time }
+
+    ProgressInput:
+      type: object
+      required: [lessonId, completed, score]
+      properties:
+        lessonId:  { type: integer }
+        completed: { type: boolean }
+        score:     { type: integer }
+
+    StreakInfo:
+      type: object
+      required: [currentStreak, longestStreak, totalXp, level, xpToNextLevel, todayCompleted]
+      properties:
+        currentStreak:  { type: integer }
+        longestStreak:  { type: integer }
+        totalXp:        { type: integer }
+        level:          { type: integer }
+        xpToNextLevel:  { type: integer }
+        todayCompleted: { type: boolean }
+
+    # ── Vocabulary ────────────────────────────────────────────────────────────
+    VocabWord:
+      type: object
+      required: [id, kazakh, russian, category, level]
+      properties:
+        id:        { type: integer }
+        kazakh:    { type: string }
+        russian:   { type: string }
+        english:   { type: ["string", "null"] }
+        category:  { type: string }
+        level:     { type: string }
+        examples:  { type: ["array", "null"], items: { type: string } }
+        audioUrl:  { type: ["string", "null"] }
+
+    VocabWordInput:
+      type: object
+      required: [kazakh, russian, category, level]
+      properties:
+        kazakh:   { type: string }
+        russian:  { type: string }
+        english:  { type: string }
+        category: { type: string }
+        level:    { type: string }
+        examples: { type: array, items: { type: string } }
+
+    VocabCategory:
+      type: object
+      required: [name, label, count]
+      properties:
+        name:  { type: string }
+        label: { type: string }
+        count: { type: integer }
+        color: { type: ["string", "null"] }
+
+    # ── Grammar ───────────────────────────────────────────────────────────────
+    GrammarRule:
+      type: object
+      required: [id, title, level, topic, description, examples]
+      properties:
+        id:          { type: integer }
+        title:       { type: string }
+        level:       { type: string }
+        topic:       { type: string }
+        description: { type: string }
+        examples:
+          type: array
+          items:
+            $ref: "#/components/schemas/GrammarExample"
+        relatedRules: { type: ["array", "null"], items: { type: integer } }
+
+    GrammarExample:
+      type: object
+      required: [kazakh, translation]
+      properties:
+        kazakh:      { type: string }
+        translation: { type: string }
+        highlight:   { type: ["string", "null"] }
+
+    GrammarRuleInput:
+      type: object
+      required: [title, level, topic, description]
+      properties:
+        title:       { type: string }
+        level:       { type: string }
+        topic:       { type: string }
+        description: { type: string }
+
+    # ── Dashboard ─────────────────────────────────────────────────────────────
+    DashboardSummary:
+      type: object
+      required: [totalXp, level, currentStreak, completedLessons, completedCourses, weeklyXp, rank]
+      properties:
+        totalXp:          { type: integer }
+        level:            { type: integer }
+        levelLabel:       { type: string }
+        currentStreak:    { type: integer }
+        completedLessons: { type: integer }
+        completedCourses: { type: integer }
+        weeklyXp:         { type: integer }
+        rank:             { type: integer }
+        xpToNextLevel:    { type: integer }
+        weeklyGoal:       { type: integer }
+        weeklyProgress:   { type: integer }
+
+    ActivityItem:
+      type: object
+      required: [id, type, title, description, xp, createdAt]
+      properties:
+        id:          { type: integer }
+        type:        { type: string, enum: [lesson_complete, achievement, streak, course_complete] }
+        title:       { type: string }
+        description: { type: string }
+        xp:          { type: integer }
+        createdAt:   { type: string, format: date-time }
+
+    PlatformStats:
+      type: object
+      required: [totalUsers, totalCourses, totalLessons, totalWords, activeLearners]
+      properties:
+        totalUsers:     { type: integer }
+        totalCourses:   { type: integer }
+        totalLessons:   { type: integer }
+        totalWords:     { type: integer }
+        activeLearners: { type: integer }
+
+    # ── Achievements ──────────────────────────────────────────────────────────
+    Achievement:
+      type: object
+      required: [id, title, description, icon, xpRequired, category]
+      properties:
+        id:          { type: integer }
+        title:       { type: string }
+        description: { type: string }
+        icon:        { type: string }
+        xpRequired:  { type: integer }
+        category:    { type: string }
+        color:       { type: ["string", "null"] }
+
+    UserAchievement:
+      type: object
+      required: [achievement, earnedAt]
+      properties:
+        achievement:
+          $ref: "#/components/schemas/Achievement"
+        earnedAt: { type: string, format: date-time }
+
+    # ── Leaderboard ───────────────────────────────────────────────────────────
+    LeaderboardEntry:
+      type: object
+      required: [rank, userId, name, xp, level, streak, avatar]
+      properties:
+        rank:   { type: integer }
+        userId: { type: integer }
+        name:   { type: string }
+        xp:     { type: integer }
+        level:  { type: integer }
+        streak: { type: integer }
+        avatar: { type: string }
+
+    # ── User ──────────────────────────────────────────────────────────────────
+    UserProfile:
+      type: object
+      required: [id, name, email, role, level, xp, streak, avatar, joinedAt]
+      properties:
+        id:       { type: integer }
+        name:     { type: string }
+        email:    { type: string }
+        role:     { type: string, enum: [student, teacher, admin] }
+        level:    { type: integer }
+        xp:       { type: integer }
+        streak:   { type: integer }
+        avatar:   { type: string }
+        bio:      { type: ["string", "null"] }
+        joinedAt: { type: string, format: date-time }
+        educationLevel: { type: ["string", "null"] }
+
+    UserProfileUpdate:
+      type: object
+      properties:
+        name:           { type: string }
+        bio:            { type: string }
+        educationLevel: { type: string }
+        avatar:         { type: string }

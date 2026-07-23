@@ -1,0 +1,27 @@
+kind = "web"
+previewPath = "/qazaq-tili/"
+title = "Қазақ Тілі — Цифрлық LMS"
+version = "1.0.0"
+id = "artifacts/qazaq-tili"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/qazaq-tili/" ]
+localPort = 23635
+
+[services.development]
+run = "pnpm --filter @workspace/qazaq-tili run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/qazaq-tili", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/qazaq-tili/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23635"
+BASE_PATH = "/qazaq-tili/"
