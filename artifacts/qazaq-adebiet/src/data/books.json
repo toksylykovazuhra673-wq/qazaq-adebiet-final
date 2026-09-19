@@ -13,6 +13,7 @@
     "subgenre": "Дидактикалық эссе",
     "language": "Қазақша",
     "pages": 176,
+    "pdf": "abai-qara-sozder.pdf",
     "chapters": 45,
     "description": "Абайдың 45 «қара сөзінен» тұратын философиялық туынды. Адамгершілік, ғылым, достық, тіршіліктің мәні жайлы терең ойлар.",
     "synopsis": "Абай «Қара сөздерінде» ХІХ ғасыр қазақ қоғамының рухани-адамгершілік мәселелерін көтерді. Білімсіздік, надандық, жалқаулық, артықшылдыққа қарсы. Ғылым мен еңбектің, достықтың маңызын дәріптеді.",
@@ -35,11 +36,14 @@
     "difficulty": "Орташа",
     "tags": ["Мектеп бағдарламасы", "Философия", "Классик", "Дидактика"],
     "coverImage": "",
-    "pdfAvailable": false,
-    "audioAvailable": false,
-    "viewCount": 8720,
-    "rating": 4.9,
-    "addedDate": "2024-01-01"
+"pdfAvailable": true,
+"pdfFile": "abai-qara-sozder.pdf",
+"audioAvailable": false,
+"audio": "",
+"video": "abai-omirbayan.mp4",
+"viewCount": 8720,
+"rating": 4.9,
+"addedDate": "2024-01-01"
   },
   {
     "id": "auezov-abai-zholy",

@@ -206,14 +206,14 @@
       }
     ],
     "videos": [
-      {
-        "id": 1,
-        "title": "Абай Құнанбайұлы туралы деректі фильм",
-        "url": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
-        "duration": "45:00",
-        "thumbnail": ""
-      }
-    ],
+  {
+    "id": "abai-omirbayany",
+    "title": "Абай Құнанбайұлы туралы деректі фильм",
+    "url": "/video/abai-omirbayany.mp4",
+    "duration": "4:11",
+    "thumbnail": ""
+  }
+],
     "audio": [
       {
         "id": 1,

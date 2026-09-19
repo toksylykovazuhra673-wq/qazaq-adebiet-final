@@ -2,7 +2,7 @@ import { createRoot } from 'react-dom/client';
 import { ThemeProvider } from './components/ThemeProvider';
 import App from './App';
 import './index.css';
-
+import AuthGate from './components/AuthGate';
 // Apply theme class immediately to avoid flash
 (function applyThemeEarly() {
   try {
@@ -18,6 +18,8 @@ import './index.css';
 
 createRoot(document.getElementById('root')!).render(
   <ThemeProvider>
-    <App />
+    <AuthGate>
+  <App />
+</AuthGate>
   </ThemeProvider>,
 );

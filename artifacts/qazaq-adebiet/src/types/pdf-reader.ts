@@ -13,7 +13,7 @@ export interface TocEntry {
   children?: TocEntry[];
 }
 
-export interface PdfBook {
+ export interface PdfBook {
   id: number;
   slug: string;
   title: string;
@@ -22,14 +22,14 @@ export interface PdfBook {
   pages: number;
   year: string;
   cover: string;
-  pdfFile: string;        // path inside public/pdf/
   description: string;
   grade?: string;
   language: string;
   allowDownload: boolean;
+  pdfFile?: string;
   tableOfContents: TocEntry[];
   tags: string[];
-  readingTimeMin?: number; // auto-calculated if not given
+  readingTimeMin?: number;
 }
 
 // ─── Reader state ────────────────────────────────────────────

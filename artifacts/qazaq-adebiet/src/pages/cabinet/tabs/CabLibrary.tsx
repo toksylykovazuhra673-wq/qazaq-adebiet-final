@@ -90,9 +90,19 @@ function StudentUploadModal({ onSave, onClose }: {
     if (!file) { setError('PDF файл таңдаңыз'); return; }
     setLoading(true);
     try {
-      const pdfData = await fileToBase64(file);
-      onSave({ title: title.trim(), author: author.trim() || 'Белгісіз', pdfData, fileName: file.name, fileSizeKb: Math.round(file.size / 1024) });
-    } catch { setError('Файлды оқу кезінде қате'); }
+  onSave({
+    title: title.trim(),
+    author: author.trim() || 'Белгісіз',
+    mediaType: 'pdf',
+    fileUrl: '',
+    filePath: '',
+    fileName: file.name,
+    fileSizeKb: Math.round(file.size / 1024),
+    file,
+  });
+} catch {
+  setError('Файлды сақтау кезінде қате');
+}
     setLoading(false);
   };
 
@@ -433,13 +443,21 @@ export default function CabLibrary({ readingRecords }: Props) {
                           </div>
                         </div>
                       </div>
-                      <button
-                        onClick={() => openBase64Pdf(item.pdfData, item.title)}
-                        className="w-full mt-3 flex items-center justify-center gap-1.5 py-1.5 rounded-lg
-                          text-xs font-medium bg-emerald-500/15 border border-emerald-500/30 text-emerald-400
-                          hover:bg-emerald-500/25 transition-all">
-                        <ExternalLink size={12} /> PDF ашу
-                      </button>
+                     <a
+  href={item.fileUrl}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="w-full mt-3 flex items-center justify-center gap-1.5 py-2 text-xs font-medium bg-emerald-500/15 border border-emerald-500/30 hover:bg-emerald-500/25 transition-all"
+>
+  <ExternalLink size={12} />
+  {item.mediaType === 'pdf'
+    ? 'PDF ашу'
+    : item.mediaType === 'video'
+    ? '🎬 Видео ашу'
+    : item.mediaType === 'audio'
+    ? '🎵 Аудио ашу'
+    : '🖼️ Суретті ашу'}
+</a>
                     </div>
                   </motion.div>
                 ))}
@@ -492,7 +510,7 @@ export default function CabLibrary({ readingRecords }: Props) {
                       </div>
                       <div className="flex gap-2 mt-3">
                         <button
-                          onClick={() => openBase64Pdf(item.pdfData, item.title)}
+                          onClick={() => window.open(item.fileUrl, '_blank', 'noopener,noreferrer')}
                           className="flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg
                             text-xs font-medium bg-violet-500/15 border border-violet-500/30 text-violet-400
                             hover:bg-violet-500/25 transition-all">

@@ -16,7 +16,7 @@ const ACCENT_COLORS = [
 ];
 
 export default function FactsTab({ book }: Props) {
-  if (book.facts.length === 0) {
+  if (!Array.isArray(book.facts) || book.facts.length === 0) {
     return (
       <div className="max-w-2xl mx-auto px-4 py-16 text-center">
         <Sparkles size={40} className="text-gray-600 mx-auto mb-3" />

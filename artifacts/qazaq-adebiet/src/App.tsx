@@ -6,6 +6,7 @@ import { Route, Switch, Router as WouterRouter } from 'wouter';
 
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import AdminLogin from '@/components/AdminLogin';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   RouteFallback, GridPageSkeleton, DashboardPageSkeleton, ReaderPageSkeleton,
@@ -107,7 +108,16 @@ function Router() {
     <Switch>
       {/* HomePage — eager */}
       <Route path="/" component={HomePage} />
-
+      <Route path="/admin-login" component={AdminLogin} />
+      <Route path="/poets">
+  {() => (
+    <GridPage>
+      <AppShell>
+        <PoetsPage />
+      </AppShell>
+    </GridPage>
+  )}
+</Route>
       {/* ── Legacy URL aliases ─────────────────────────────────────────── */}
       <Route path="/aqyndar">
         {() => <GridPage><AppShell><PoetsPage /></AppShell></GridPage>}

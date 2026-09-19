@@ -8,7 +8,11 @@ export default function SummaryTab({ book }: Props) {
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-8 py-8 space-y-4">
       <Card icon={<AlignLeft size={18} className="text-violet-400" />} title="Қысқаша мазмұны" delay={0}>
-        <p className="text-gray-300 leading-relaxed">{book.summary}</p>
+        <p className="text-gray-300 leading-relaxed">
+  {typeof book.summary === "object"
+    ? JSON.stringify(book.summary)
+    : book.summary}
+</p>
       </Card>
 
       <Card icon={<Lightbulb size={18} className="text-amber-400" />} title="Тақырыбы" delay={0.07}>
@@ -20,7 +24,12 @@ export default function SummaryTab({ book }: Props) {
       </Card>
 
       <Card icon={<Layers size={18} className="text-blue-400" />} title="Композициясы" delay={0.17}>
-        <p className="text-gray-300 leading-relaxed">{book.composition}</p>
+        <p className="text-gray-300 leading-relaxed">
+  {typeof book.composition === "object"
+    ? JSON.stringify(book.composition)
+    : book.composition}
+</p>
+  
       </Card>
 
       {book.literaryDevices.length > 0 && (

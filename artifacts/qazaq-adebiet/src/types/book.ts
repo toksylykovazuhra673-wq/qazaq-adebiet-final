@@ -28,6 +28,7 @@ export interface Book {
   views: number;
   fullText: string[];
   pdf: string;
+  pdfFile?: string;
   audio: string;
   characters: BookCharacter[];
   theme: string;
@@ -45,7 +46,7 @@ export interface Book {
 
 // ─── Reader state ───────────────────────────────────────────
 export type ReaderTab =
-  | 'text' | 'pdf' | 'audio'
+  | 'text' | 'pdf' | 'audio'| 'video'
   | 'characters' | 'summary' | 'facts'
   | 'bookmarks' | 'notes';
 

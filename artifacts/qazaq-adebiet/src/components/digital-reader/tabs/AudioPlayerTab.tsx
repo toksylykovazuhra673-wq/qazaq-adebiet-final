@@ -120,7 +120,8 @@ export default function AudioPlayerTab({ book, savedTime, onTimeUpdate, onAddBoo
   };
 
   const progress = duration > 0 ? (currentT / duration) * 100 : 0;
-  const noAudio  = !book.audio;
+  const audioSrc = book.audio || '';
+const noAudio = !audioSrc;
 
   if (noAudio) {
     return (
@@ -139,7 +140,8 @@ export default function AudioPlayerTab({ book, savedTime, onTimeUpdate, onAddBoo
   }
 
   const audioUrl = `/audio/${book.audio}`;
-
+  const videoUrl = book.video ? `/video/${book.video}` : '';
+  
   return (
     <div className="max-w-lg mx-auto px-4 py-8">
       <audio ref={audioRef} src={audioUrl}

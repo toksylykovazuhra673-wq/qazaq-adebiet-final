@@ -54,7 +54,7 @@ export default function PdfViewTab({ book, currentPage, onPageChange }: Props) {
   const [pageInput,   setPageInput]  = useState('');
   const [editingPage, setEditingPage] = useState(false);
 
-  const pdfUrl = book.pdf ? `/pdf/${book.pdf}` : '';
+   const pdfUrl = `/pdf/${book.pdfFile || book.pdf || 'abai-qara-sozder.pdf'}`;
 
   // Fullscreen
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function PdfViewTab({ book, currentPage, onPageChange }: Props) {
 
   // Print PDF
   const handlePrint = () => {
-    if (!book.pdf) return;
+    if (!pdfUrl) return;
     const iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = pdfUrl;
