@@ -28,7 +28,7 @@ export default function CabAssignments() {
       const { data, error } = await supabase
         .from('assignments')
         .select('*')
-        .eq('status', 'published')
+        .eq('status', 'active')
         .order('created_at', { ascending: false });
 
       if (error) {
