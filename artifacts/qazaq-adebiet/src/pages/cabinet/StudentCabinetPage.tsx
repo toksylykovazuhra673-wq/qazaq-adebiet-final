@@ -15,6 +15,7 @@ import {
 } from '@/hooks/useStudentCabinet';
 
 import CabDashboard    from './tabs/CabDashboard';
+import CabAssignments from './tabs/CabAssignments';
 import CabLibrary      from './tabs/CabLibrary';
 import CabTests        from './tabs/CabTests';
 import CabProgress     from './tabs/CabProgress';
@@ -27,6 +28,7 @@ import type { CabTab } from '@/types/student';
 const TABS: { id: CabTab; label: string; labelShort: string; Icon: React.ElementType }[] = [
   { id: 'dashboard',    label: 'Басты бет',      labelShort: 'Басты',    Icon: LayoutDashboard },
   { id: 'library',      label: 'Кітапхана',      labelShort: 'Кітап',    Icon: BookOpen        },
+  { id: 'assignments', label: 'Мұғалім тапсырмалары', labelShort: 'Тапсырмалар', Icon: Check },
   { id: 'tests',        label: 'Тесттер',         labelShort: 'Тест',     Icon: Target          },
   { id: 'progress',     label: 'Прогресс',        labelShort: 'Прогресс', Icon: TrendingUp      },
   { id: 'certificates', label: 'Сертификаттар',   labelShort: 'Серт.',    Icon: Award           },
@@ -247,10 +249,14 @@ export default function StudentCabinetPage() {
                   testRecords={testRecords}
                   onTabChange={handleTabChange}
                 />
-              )}
+      )}
+              
               {activeTab === 'library' && (
                 <CabLibrary readingRecords={readingRecords} />
               )}
+              {activeTab === 'assignments' && (
+  <CabAssignments />
+)}
               {activeTab === 'tests' && (
                 <CabTests testRecords={testRecords} />
               )}

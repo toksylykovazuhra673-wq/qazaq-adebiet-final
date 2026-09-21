@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 import type {
   TeacherData, TeacherProfile, ClassRecord, Student,
   Assignment, GradeRecord, LessonPlan,
@@ -127,9 +128,40 @@ export function useTeacherDashboard() {
     update(d => ({ ...d, students: d.students.filter(s => s.id !== id) })), [update]);
 
   // ── Assignments ───────────────────────────────────────────────────────────
-  const addAssignment = useCallback((a: Omit<Assignment, 'id' | 'createdAt'>) =>
-    update(d => ({ ...d, assignments: [...d.assignments, { ...a, id: uid(), createdAt: Date.now() }] })),
-  [update]);
+  const addAssignment = useCallback(async (a: Omit<Assignment, 'id' | 'createdAt'>) => {
+  const { data: saved, error } = await supabase
+    .from('assignments')
+    .insert({
+      class_id: a.classId,
+      title: a.title,
+      type: a.type,
+      book_slug: a.bookSlug || null,
+      analysis_slug: a.analysisSlug || null,
+      due_date: a.dueDate || null,
+      points: a.points,
+      instructions: a.instructions || null,
+      status: a.status,
+    })
+    .select()
+    .single();
+
+  if (error) {
+    console.error('Тапсырманы сақтау қатесі:', error);
+    return;
+  }
+
+  update(d => ({
+    ...d,
+    assignments: [
+      ...d.assignments,
+      {
+        ...a,
+        id: saved.id,
+        createdAt: new Date(saved.created_at).getTime(),
+      },
+    ],
+  }));
+}, [update]);
 
   const updateAssignment = useCallback((a: Assignment) =>
     update(d => ({ ...d, assignments: d.assignments.map(x => x.id === a.id ? a : x) })), [update]);

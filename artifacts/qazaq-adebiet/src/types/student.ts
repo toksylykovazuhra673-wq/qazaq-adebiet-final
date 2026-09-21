@@ -1,6 +1,7 @@
 export type CabTab =
   | 'dashboard'
   | 'library'
+    | 'assignments'
   | 'tests'
   | 'progress'
   | 'certificates'
@@ -10,6 +11,7 @@ export interface StudentProfile {
   name: string;
   grade: string;
   school: string;
+  classId: string;
 }
 
 export interface ReadingRecord {

@@ -1,5 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import type { StudentProfile, ReadingRecord, TestRecord, Certificate } from '@/types/student';
+import { supabase } from '@/lib/supabase';
 
 // All known book slugs (matches books.json id fields)
 export const ALL_BOOK_SLUGS = [
@@ -19,6 +20,7 @@ const DEFAULT_PROFILE: StudentProfile = {
   name: 'Оқушы',
   grade: '9-сынып',
   school: 'Мектеп',
+  classId: '',
 };
 
 function loadProfile(): StudentProfile {
@@ -168,12 +170,11 @@ export function useStudentCabinet() {
 
   const readingRecords = useMemo(loadReadingRecords, []);
   const testRecords    = useMemo(loadTestRecords,    []);
-
-  const saveProfile = useCallback((p: StudentProfile) => {
-    localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
-    setProfileState(p);
-    setEditingProfile(false);
-  }, []);
+const saveProfile = useCallback((p: StudentProfile) => {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(p));
+  setProfileState(p);
+  setEditingProfile(false);
+}, []);
 
   return {
     profile,
