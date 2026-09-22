@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import type { TeacherUpload, StudentUpload } from '@/types/upload';
 import { STUDENT_UPLOADS_KEY } from '@/types/upload';
 import { supabase } from '@/lib/supabase';
@@ -46,6 +46,9 @@ export function useTeacherUploads(teacherName: string) {
       setLoading(false);
     }
   }, [teacherName]);
+    useEffect(() => {
+    loadUploads();
+  }, [loadUploads]);
 
   const addUpload = useCallback(async (
     data: Omit<TeacherUpload, 'id' | 'uploadedAt' | 'teacherName'>

@@ -37,13 +37,31 @@ const TABS: { id: CabTab; label: string; labelShort: string; Icon: React.Element
 
 // ── Profile Edit Modal ──────────────────────────────────────────────────────
 function ProfileModal({
+
   profile, onSave, onClose,
 }: {
-  profile: { name: string; grade: string; school: string };
-  onSave: (p: { name: string; grade: string; school: string }) => void;
+profile: { name: string; grade: string; school: string; classId: string };
+  onSave: (p: { name: string; grade: string; school: string; classId: string }) => void;
   onClose: () => void;
+
 }) {
   const [form, setForm] = useState(profile);
+  const classes = [
+  { id: 'cls5a', name: '5 "а"' },
+  { id: 'cls5a2', name: '5 "ә"' },
+  { id: 'cls6a', name: '6 "а"' },
+  { id: 'cls6a2', name: '6 "ә"' },
+  { id: 'cls7a', name: '7 "а"' },
+  { id: 'cls7a2', name: '7 "ә"' },
+  { id: 'cls8a', name: '8 "а"' },
+  { id: 'cls8a2', name: '8 "ә"' },
+  { id: 'cls9a', name: '9 "а"' },
+  { id: 'cls9a2', name: '9 "ә"' },
+  { id: 'cls2', name: '10 "а"' },
+  { id: 'cls10a2', name: '10 "ә"' },
+  { id: 'cls11a', name: '11 "а"' },
+  { id: 'cls11a2', name: '11 "ә"' },
+];
   return (
     <motion.div
       initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
@@ -56,23 +74,80 @@ function ProfileModal({
         <h2 className="text-white font-bold text-lg mb-5 flex items-center gap-2">
           <User size={18} className="text-violet-400" /> Профиль редактирлеу
         </h2>
-        <div className="space-y-3">
-          {[
-            { key: 'name',   label: 'Аты-жөні',   placeholder: 'Мысалы: Айгерім Бекова' },
-            { key: 'grade',  label: 'Сынып',       placeholder: 'Мысалы: 9-сынып'        },
-            { key: 'school', label: 'Мектеп',      placeholder: 'Мектеп атауы'            },
-          ].map(f => (
-            <div key={f.key}>
-              <label className="text-gray-500 text-xs block mb-1">{f.label}</label>
-              <input
-                value={form[f.key as keyof typeof form]}
-                onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
-                placeholder={f.placeholder}
-                className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm
-                  text-white placeholder-gray-600 focus:outline-none focus:border-violet-500/50" />
-            </div>
-          ))}
-        </div>
+   <div className="space-y-3">
+  <div>
+    <label className="text-gray-500 text-xs block mb-1">
+      Аты-жөні
+    </label>
+    <input
+      value={form.name}
+      onChange={e => setForm(prev => ({ ...prev, name: e.target.value }))}
+      placeholder="Мысалы: Айгерім Бекова"
+      className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm
+        text-white placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+    />
+  </div>
+
+  <div>
+    <label className="text-gray-500 text-xs block mb-1">
+      Сынып
+    </label>
+    <select
+  onChange={(e) => {
+  const selectedClass = classes.find(
+    (item) => item.id === e.target.value
+  );
+
+  setForm((prev) => ({
+    ...prev,
+    classId: e.target.value,
+    grade: selectedClass?.name ?? prev.grade,
+  }));
+}}
+  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white"
+>
+  <option value="">Сыныпты таңдаңыз</option>
+  {classes.map(cls => (
+    <option key={cls.id} value={cls.id}>
+      {cls.name}
+    </option>
+  ))}
+</select>
+  </div>
+
+  <div>
+    <label className="text-gray-500 text-xs block mb-1">
+      Мектеп
+    </label>
+    <input
+      value={form.school}
+      onChange={e => setForm(prev => ({ ...prev, school: e.target.value }))}
+      placeholder="Мектеп атауы"
+      className="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm
+        text-white placeholder-gray-600 focus:outline-none focus:border-violet-500/50"
+    />
+  </div>
+
+  <div>
+    <label className="text-gray-500 text-xs block mb-1">
+      Сыныпты таңдаңыз
+    </label>
+    <select
+      value={form.classId}
+      onChange={e => setForm(prev => ({ ...prev, classId: e.target.value }))}
+      className="w-full bg-gray-900 border border-white/10 rounded-xl px-3.5 py-2.5 text-sm
+        text-white focus:outline-none focus:border-violet-500/50"
+    >
+      <option value="">Сыныпты таңдаңыз</option>
+
+      {classes.map(item => (
+        <option key={item.id} value={item.id}>
+          {item.name}
+        </option>
+      ))}
+    </select>
+  </div>
+</div>
         <div className="flex gap-2 mt-5">
           <button onClick={onClose}
             className="flex-1 py-2.5 rounded-xl border border-white/10 text-gray-400 text-sm hover:bg-white/5 transition-all flex items-center justify-center gap-2">
@@ -145,7 +220,9 @@ export default function StudentCabinetPage() {
             </div>
             <div className="text-left hidden sm:block">
               <div className="text-white text-xs font-medium leading-none">{profile.name}</div>
-              <div className="text-gray-600 text-[10px] mt-0.5">{profile.grade}</div>
+              <div className="text-gray-600 text-[10px] mt-0.5">{profile.classId === 'cls2' ? '10 «а»' : profile.grade}
+
+              </div>
             </div>
             {/* XP badge */}
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-violet-500/15 border border-violet-500/25">
@@ -172,7 +249,7 @@ export default function StudentCabinetPage() {
               {profile.name.slice(0, 1).toUpperCase()}
             </div>
             <div className="text-white font-semibold text-sm">{profile.name}</div>
-            <div className="text-gray-500 text-xs mt-0.5">{profile.grade}</div>
+            <div className="text-gray-500 text-xs mt-0.5">{profile.classId === 'cls2' ? '10 «а»' : profile.grade}</div>
             <div className="text-gray-600 text-[11px]">{profile.school}</div>
             {/* XP bar */}
             <div className="mt-3">
@@ -255,7 +332,7 @@ export default function StudentCabinetPage() {
                 <CabLibrary readingRecords={readingRecords} />
               )}
               {activeTab === 'assignments' && (
-  <CabAssignments />
+  <CabAssignments classId={profile.classId} />
 )}
               {activeTab === 'tests' && (
                 <CabTests testRecords={testRecords} />

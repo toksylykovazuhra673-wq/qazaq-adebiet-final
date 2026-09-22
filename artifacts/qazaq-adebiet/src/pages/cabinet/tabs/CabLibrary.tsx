@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback } from 'react';
+import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import {
@@ -8,6 +9,7 @@ import {
 } from 'lucide-react';
 import type { ReadingRecord } from '@/types/student';
 import type { TeacherUpload, StudentUpload } from '@/types/upload';
+import { useTeacherUploads } from '@/hooks/useUploads';
 import { MAX_PDF_BYTES, MAX_PDF_MB, openBase64Pdf, TEACHER_UPLOADS_KEY } from '@/types/upload';
 import { useStudentUploads, fileToBase64 } from '@/hooks/useUploads';
 import rawBooks from '@/data/books.json';
@@ -188,41 +190,54 @@ function StudentUploadModal({ onSave, onClose }: {
 // ── Main CabLibrary ───────────────────────────────────────────────────────────
 export default function CabLibrary({ readingRecords }: Props) {
   const [, navigate] = useLocation();
-  const [filter, setFilter]   = useState<LibFilter>('all');
-  const [search, setSearch]   = useState('');
-  const [showUpload, setShowUpload] = useState(false);
-  const [activeSection, setActiveSection] = useState<'system' | 'teacher' | 'mine'>('system');
+const [filter, setFilter] = useState<LibFilter>('all');
+const [search, setSearch] = useState('');
+const [showUpload, setShowUpload] = useState(false);
+const [confirmDel, setConfirmDel] = useState<string | null>(null);
+const [activeSection, setActiveSection] = useState<'system' | 'teacher' | 'mine'>('system');
 
   // Student personal uploads
   const { uploads: myUploads, addUpload, deleteUpload } = useStudentUploads();
-  const [confirmDel, setConfirmDel] = useState<string | null>(null);
-
-  // Teacher uploads (read-only from localStorage)
-  const [teacherUploads] = useState<TeacherUpload[]>(() => {
-    try { return JSON.parse(localStorage.getItem(TEACHER_UPLOADS_KEY) ?? '[]') as TeacherUpload[]; }
-    catch { return []; }
-  });
+  
 
   const recMap = Object.fromEntries(readingRecords.map(r => [r.bookSlug, r]));
 
-  const filtered = BOOKS.filter(book => {
-    const rec = recMap[book.id];
-    const q = search.toLowerCase();
-    const matchSearch = !q ||
-      book.title.toLowerCase().includes(q) ||
-      (book.authorName ?? '').toLowerCase().includes(q) ||
-      (book.genre ?? '').toLowerCase().includes(q);
-    if (!matchSearch) return false;
-    switch (filter) {
-      case 'reading':   return rec && rec.textProgress > 0 && rec.textProgress < 90;
-      case 'finished':  return rec && rec.textProgress >= 90;
-      case 'favorites': return rec?.isFavorite;
-      case 'pdf':       return book.pdfAvailable;
-      case 'audio':     return book.audioAvailable;
-      default:          return true;
-    }
-  });
+ const filtered = BOOKS.filter(book => {
+  const rec = recMap[book.id];
+  const q = search.toLowerCase();
 
+  const matchSearch =
+    !q ||
+    book.title.toLowerCase().includes(q) ||
+    (book.authorName ?? '').toLowerCase().includes(q) ||
+    (book.genre ?? '').toLowerCase().includes(q);
+
+  if (!matchSearch) return false;
+
+  switch (filter) {
+    case 'reading':
+      return rec && rec.textProgress > 0 && rec.textProgress < 90;
+
+    case 'finished':
+      return rec && rec.textProgress >= 90;
+
+    case 'favorites':
+      return rec?.isFavorite;
+
+    case 'pdf':
+      return book.pdfAvailable;
+
+    case 'audio':
+      return book.audioAvailable;
+
+    case 'all':
+    default:
+      return true;
+  }
+});
+
+const { uploads: teacherUploads } = useTeacherUploads('');
+  
   const FILTERS: { id: LibFilter; label: string }[] = [
     { id: 'all',       label: 'Барлығы' },
     { id: 'reading',   label: 'Оқылуда' },
@@ -362,7 +377,7 @@ export default function CabLibrary({ readingRecords }: Props) {
                       </div>
                     )}
                     <div className="flex gap-2 mt-3">
-                      <button onClick={() => navigate(`/reader/${book.id}`)}
+                      <button onClick={() => navigate(`/reader/${book.slug}`)}
                         className={`flex-1 flex items-center justify-center gap-1.5 py-1.5 rounded-lg text-xs font-medium transition-all ${
                           pct > 0
                             ? 'bg-violet-500/15 border border-violet-500/30 text-violet-400 hover:bg-violet-500/25'
@@ -372,18 +387,23 @@ export default function CabLibrary({ readingRecords }: Props) {
                         {pct > 0 ? 'Жалғастыру' : 'Ашу'}
                         <ChevronRight size={11} className="ml-auto" />
                       </button>
-                      {book.pdfAvailable && (
-                        <button onClick={() => navigate(`/reader/${book.id}`)}
-                          className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all">
-                          <FileText size={13} />
-                        </button>
-                      )}
-                      {book.audioAvailable && (
-                        <button onClick={() => navigate(`/reader/${book.id}`)}
-                          className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 transition-all">
-                          <Headphones size={13} />
-                        </button>
-                      )}
+                     {book.pdfAvailable && (
+  <button
+    onClick={() => navigate(`/reader/${book.slug}`)}
+    className="p-1.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 hover:bg-blue-500/20 transition-all"
+  >
+    <FileText size={13} />
+  </button>
+)}
+
+{book.audioAvailable && (
+  <button
+    onClick={() => navigate(`/reader/${book.slug}`)}
+    className="p-1.5 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 hover:bg-indigo-500/20 transition-all"
+  >
+    <Headphones size={13} />
+  </button>
+)}
                     </div>
                   </div>
                 </motion.div>

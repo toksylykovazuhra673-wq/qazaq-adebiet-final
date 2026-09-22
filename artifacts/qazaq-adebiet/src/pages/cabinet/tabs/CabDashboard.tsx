@@ -121,7 +121,7 @@ export default function CabDashboard({
           <div>
             <div className="text-xs text-gray-500 mb-1">Сәлеметсің бе,</div>
             <h2 className="text-2xl font-bold text-white">{profile.name}! 👋</h2>
-            <div className="text-gray-400 text-sm">{profile.grade} · {profile.school}</div>
+       <div className="text-sm">{profile.grade} · {profile.school}</div>
           </div>
           <div className="flex-shrink-0 text-right">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-violet-500/15 border border-violet-500/30">

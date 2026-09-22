@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLocation } from 'wouter';
 import {
@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import type { Assignment, ClassRecord, AssignmentType } from '@/types/teacher';
 import booksData from '@/data/books.json';
+import { supabase } from '@/lib/supabase';
 
 interface Props {
   assignments: Assignment[];
@@ -181,10 +182,43 @@ function AssignModal({
 }
 
 export default function TchAssignments({ assignments, classes, studentCounts, onAdd, onUpdate, onDelete }: Props) {
+  
+
+  function getGrade(score: number): number {
+    if (score >= 9) return 5;
+    if (score >= 7) return 4;
+    if (score >= 5) return 3;
+    return 2;
+  }
+
+
   const [, navigate] = useLocation();
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState<Assignment | null>(null);
   const [filterCls, setFilterCls] = useState('all');
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
+const [submissions, setSubmissions] = useState<any[]>([]);
+const [loadingSubmissions, setLoadingSubmissions] = useState(false);
+
+const openSubmissions = async (assignment: Assignment) => {
+  setSelectedAssignment(assignment);
+  setLoadingSubmissions(true);
+
+  const { data, error } = await supabase
+    .from('assignment_submissions')
+    .select('*')
+    .eq('assignment_id', assignment.id)
+    .order('submitted_at', { ascending: false });
+
+  if (error) {
+    console.error('Submissions load error:', error);
+    setSubmissions([]);
+  } else {
+    setSubmissions(data ?? []);
+  }
+
+  setLoadingSubmissions(false);
+};
 
   const clsMap = Object.fromEntries(classes.map(c => [c.id, c]));
 
@@ -280,6 +314,13 @@ export default function TchAssignments({ assignments, classes, studentCounts, on
 
                   {/* Actions */}
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                    <button
+  onClick={() => openSubmissions(a)}
+  className="p-1.5 rounded-lg text-gray-500 hover:text-emerald-400 hover:bg-emerald-500/10 transition-all"
+  title="Оқушы жауаптары"
+>
+  <Users size={13} />
+</button>
                     {a.type === 'analysis' && a.analysisSlug && (
                       <button onClick={() => navigate(`/analysis/${a.analysisSlug}`)}
                         className="p-1.5 rounded-lg text-gray-500 hover:text-blue-400 hover:bg-blue-500/10 transition-all">
@@ -316,6 +357,196 @@ export default function TchAssignments({ assignments, classes, studentCounts, on
             } : undefined}
           />
         )}
+              <AnimatePresence>
+        {selectedAssignment && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm"
+            onClick={() => setSelectedAssignment(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, y: 20 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 20 }}
+              onClick={e => e.stopPropagation()}
+              className="bg-gray-900 border border-white/10 rounded-3xl p-6 w-full max-w-2xl shadow-2xl max-h-[90vh] overflow-y-auto"
+            >
+              <div className="flex items-center justify-between mb-5">
+                <div>
+                  <h2 className="text-white font-bold text-lg">
+                    Оқушы жауаптары
+                  </h2>
+                  <p className="text-gray-500 text-sm">
+                    {selectedAssignment.title}
+                  </p>
+                </div>
+
+                <button
+                  onClick={() => setSelectedAssignment(null)}
+                  className="p-2 rounded-xl text-gray-500 hover:text-white hover:bg-white/10"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {loadingSubmissions ? (
+                <div className="text-center py-10 text-gray-500">
+                  Жауаптар жүктелуде...
+                </div>
+              ) : submissions.length === 0 ? (
+                <div className="text-center py-10">
+                  <Users size={35} className="mx-auto mb-3 text-gray-600" />
+                  <p className="text-gray-400">
+                    Әзірге оқушы жауабы жоқ
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {submissions.map((submission) => (
+                    <div
+                      key={submission.id}
+                      className="p-4 rounded-2xl bg-white/5 border border-white/10"
+                    >
+                      <div className="flex items-center justify-between gap-3 mb-3">
+                        <div>
+                          <p className="text-white font-semibold">
+                            {submission.student_name}
+                          </p>
+                          <p className="text-gray-600 text-xs mt-1">
+                            {submission.submitted_at
+                              ? new Date(
+                                  submission.submitted_at
+                                ).toLocaleString('kk-KZ')
+                              : ''}
+                          </p>
+                        </div>
+
+                        <span className="text-xs px-2.5 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          {submission.status === 'graded'
+                            ? 'Бағаланған'
+                            : 'Жіберілді'}
+                        </span>
+                      </div>
+
+                      <div className="mb-4">
+                        <p className="text-gray-500 text-xs mb-2">
+                          Оқушының жауабы:
+                        </p>
+
+                        <div className="p-3 rounded-xl bg-black/20 border border-white/5 text-gray-300 text-sm whitespace-pre-wrap">
+                          {submission.answer_text || 'Жауап мәтіні жоқ'}
+                        </div>
+                      </div>
+
+                      <div className="flex items-end gap-3">
+                        <div className="flex-1">
+                          <label className="text-gray-500 text-xs block mb-1">
+                            Баға / ұпай
+                          </label>
+
+                          <input
+                            type="number"
+                            min={0}
+                            max={selectedAssignment.points}
+                            defaultValue={submission.score ?? ''}
+                            id={`score-${submission.id}`}
+                            placeholder={`0–${selectedAssignment.points}`}
+                            className="input-field"
+                          />
+                        </div>
+
+                        <button
+                          onClick={async () => {
+                            const input = document.getElementById(
+                              `score-${submission.id}`
+                            ) as HTMLInputElement | null;
+
+                            const score = Number(input?.value);
+
+                            if (
+                              Number.isNaN(score) ||
+                              score < 0 ||
+                              score > selectedAssignment.points
+                            ) {
+                              alert(
+                                `0 мен ${selectedAssignment.points} аралығында ұпай енгізіңіз.`
+                              );
+                              return;
+                            }
+
+                            const grade = getGrade(score);
+
+const { error } = await supabase
+  .from('assignment_submissions')
+  .update({
+    score,
+    grade,
+    status: 'graded',
+    graded_at: new Date().toISOString(),
+  })
+  .eq('id', submission.id);
+
+if (error) {
+  console.error('Grade save error:', error);
+
+  alert(
+    `Бағаны сақтау кезінде қате шықты:\n\n${error.message}`
+  );
+
+  return;
+}
+
+setSubmissions(prev =>
+  prev.map(item =>
+    item.id === submission.id
+      ? {
+          ...item,
+          score,
+          grade,
+          status: 'graded',
+        }
+      : item
+  )
+);
+
+alert(`${score}/10 ұпай, ${grade} бағасы сақталды! ✅`);
+
+                            if (error) {
+                              console.error(error);
+                              alert('Бағаны сақтау кезінде қате шықты.');
+                              return;
+                            }
+
+                            setSubmissions(prev =>
+                              prev.map(item =>
+                                item.id === submission.id
+                                  ? {
+                                      ...item,
+                                      score,
+                                      status: 'graded',
+                                    }
+                                  : item
+                              )
+                            );
+
+                            alert('Баға сақталды! ✅');
+                          }}
+                          className="btn-primary"
+                        >
+                          <Check size={14} />
+                          Бағаны сақтау
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       </AnimatePresence>
     </div>
   );
