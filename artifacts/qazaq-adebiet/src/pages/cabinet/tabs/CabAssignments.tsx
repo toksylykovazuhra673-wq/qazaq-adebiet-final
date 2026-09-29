@@ -373,11 +373,12 @@ const { error } = await supabase
               </label>
 
               <input
-                value={studentName}
-                onChange={(e) => setStudentName(e.target.value)}
-                placeholder="Мысалы: Аманкелді Ернұр"
-                className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-violet-500"
-              />
+  value={studentName}
+  onChange={(e) => setStudentName(e.target.value)}
+  placeholder="Мысалы: Аманкелді Ернұр"
+  spellCheck={false}
+  className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 caret-violet-600 outline-none focus:border-violet-500"
+/>
             </div>
 
             {/* ANSWER */}
@@ -387,12 +388,13 @@ const { error } = await supabase
               </label>
 
               <textarea
-                value={answer}
-                onChange={(e) => setAnswer(e.target.value)}
-                placeholder="Жауабыңызды осы жерге жазыңыз..."
-                rows={8}
-                className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-violet-500"
-              />
+  value={answer}
+  onChange={(e) => setAnswer(e.target.value)}
+  placeholder="Жауабыңызды осы жерге жазыңыз..."
+  rows={8}
+  spellCheck={false}
+  className="w-full resize-none rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 caret-violet-600 outline-none focus:border-violet-500"
+/>
             </div>
 
             {/* BUTTONS */}
