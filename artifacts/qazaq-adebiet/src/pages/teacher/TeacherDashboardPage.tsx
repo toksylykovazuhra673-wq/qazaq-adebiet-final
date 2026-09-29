@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import TchUbtKtj from './tabs/TchUbtKtj';
 import { useLocation } from 'wouter';
 import {
   GraduationCap, Users, Target, BookOpen, BarChart3,
@@ -24,14 +25,15 @@ import './teacher.css';
 
 // ── Tab config ──────────────────────────────────────────────────────────────
 const TABS: { id: TeachTab; label: string; short: string; Icon: React.ElementType }[] = [
-  { id: 'classes',     label: 'Сыныптар',       short: 'Сынып',   Icon: GraduationCap },
-  { id: 'students',    label: 'Оқушылар',        short: 'Оқушы',   Icon: Users         },
-  { id: 'assignments', label: 'Тапсырмалар',     short: 'Тапсырма',Icon: Target        },
-  { id: 'grades',      label: 'Бағалар',         short: 'Баға',    Icon: BookOpen      },
-  { id: 'analytics',   label: 'Статистика',      short: 'Стат.',   Icon: BarChart3     },
-  { id: 'certificates',label: 'Сертификаттар',   short: 'Серт.',   Icon: Award         },
-  { id: 'lessonplans', label: 'ҚМЖ / БЖБ / ТЖБ', short: 'Жоспар', Icon: FileText      },
-  { id: 'uploads',     label: 'Менің шығармаларым', short: 'PDF',  Icon: Upload        },
+  { id: 'classes',      label: 'Сыныптар',            short: 'Сынып',    Icon: GraduationCap },
+  { id: 'students',     label: 'Оқушылар',            short: 'Оқушы',    Icon: Users },
+  { id: 'assignments',  label: 'Тапсырмалар',         short: 'Тапсырма', Icon: Target },
+  { id: 'grades',       label: 'Бағалар',             short: 'Баға',     Icon: BookOpen },
+  { id: 'analytics',    label: 'Статистика',          short: 'Стат.',    Icon: BarChart3 },
+  { id: 'certificates', label: 'Сертификаттар',       short: 'Серт.',    Icon: Award },
+  { id: 'lessonplans',  label: 'ҚМЖ / БЖБ / ТЖБ',     short: 'Жоспар',   Icon: FileText },
+  { id: 'ubtktj',       label: 'ҰБТ КТЖ',             short: 'КТЖ',      Icon: BookOpen },
+  { id: 'uploads',      label: 'Менің шығармаларым',   short: 'PDF',      Icon: Upload },
 ];
 
 // ── Profile Modal ───────────────────────────────────────────────────────────
@@ -339,6 +341,9 @@ export default function TeacherDashboardPage() {
                   onDelete={deleteLessonPlan}
                 />
               )}
+              {activeTab === 'ubtktj' && (
+  <TchUbtKtj />
+)}
 
               {activeTab === 'uploads' && (
                 <TchUploads teacherName={data.profile.name} />

@@ -8,6 +8,7 @@ export type TeachTab =
   | 'analytics'
   | 'certificates'
   | 'lessonplans'
+  | 'ubtktj'
   | 'uploads';
 
 export interface TeacherProfile {
