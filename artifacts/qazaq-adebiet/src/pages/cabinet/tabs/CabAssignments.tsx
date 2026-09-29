@@ -35,6 +35,24 @@ const [mySubmissions, setMySubmissions] = useState<any[]>([]);
 
 useEffect(() => {
   async function loadStudentName() {
+    // 1. Алдымен оқушы профилін localStorage-тан аламыз
+    try {
+      const rawProfile = localStorage.getItem('student_profile');
+
+      if (rawProfile) {
+        const profile = JSON.parse(rawProfile);
+
+        if (profile.name) {
+          setStudentName(profile.name);
+          return;
+        }
+      }
+    } catch (error) {
+      console.error('Оқушы профилін оқу қатесі:', error);
+    }
+
+    // 2. Егер localStorage-та аты болмаса,
+    // Supabase аккаунтынан аламыз
     const {
       data: { user },
     } = await supabase.auth.getUser();
